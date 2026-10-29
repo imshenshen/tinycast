@@ -136,6 +136,9 @@ struct CalendarSettingsView: View {
             FeatureCommandsSection(owner: .calendar, anchor: .calendarCommands)
                 .settingsEnabled(settings.calendarEnabled)
 
+            JoyDaySection()
+                .settingsEnabled(settings.calendarEnabled)
+
             CalendarPickerSection()
                 .settingsEnabled(settings.calendarEnabled)
         }
@@ -190,6 +193,69 @@ private struct MeetingBrowserPicker: View {
             get: { browsers.contains { $0.id == selection } ? selection : nil },
             set: { selection = $0 }
         )
+    }
+}
+
+/// 京ME's JoyDay calendar, merged alongside EventKit's.
+///
+/// JoyDay has no API key: its web client signs every request, and the only session available lives
+/// in the tab 京ME already has open. Enabling this lets Tinycast read that session and fetch the
+/// same events the JoyDay page shows.
+private struct JoyDaySection: View {
+    @Environment(CalendarStore.self) private var store
+
+    var body: some View {
+        Section {
+            Toggle(isOn: enabled) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("京ME Calendar").fontWeight(.semibold)
+                    Text("Merges JoyDay events from 京ME with Apple Calendar.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            if store.joyDayEnabled {
+                SettingsRow(title: statusTitle, subtitle: statusSubtitle) {
+                    HStack(spacing: Theme.Spacing.lg) {
+                        Button("Refresh") { store.refreshJoyDay() }
+                        Button("Open in 京ME") { store.openJoyDayInMe() }
+                    }
+                }
+                Text(
+                    """
+                    Uses the JoyDay tab open in 京ME. 京ME must allow JavaScript from Apple \
+                    Events (browser.allow_javascript_apple_events in its Chromium profile), \
+                    and Tinycast needs Automation access to 京ME.
+                    """)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+        } header: {
+            Text("京ME")
+        }
+    }
+
+    private var enabled: Binding<Bool> {
+        Binding(get: { store.joyDayEnabled }, set: { store.setJoyDayEnabled($0) })
+    }
+
+    private var statusTitle: String {
+        switch store.joyDayStatus {
+        case .off: return String(localized: "Off")
+        case .connecting: return String(localized: "Reading JoyDay…")
+        case .ready(let date):
+            let time = date.formatted(date: .omitted, time: .shortened)
+            return String(localized: "Updated \(time)")
+        case .needsAttention(let message): return message
+        }
+    }
+
+    private var statusSubtitle: String? {
+        switch store.joyDayStatus {
+        case .ready: return String(localized: "JoyDay refreshes every few minutes.")
+        case .connecting: return nil
+        case .off, .needsAttention: return String(localized: "Nothing leaves this Mac but the request to JoyDay.")
+        }
     }
 }
 

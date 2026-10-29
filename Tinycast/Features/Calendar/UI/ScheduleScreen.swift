@@ -17,10 +17,12 @@ struct ScheduleScreen: PaletteScreen {
         }
     }
 
-    /// A meeting with no link has nowhere to join, so the pill offers what it can instead.
+    /// ↵ joins a meeting, explains a JoyDay event, or opens an appointment in Calendar.
     var primaryActionTitle: String {
-        meeting(at: vm.selection)?.link == nil
-            ? String(localized: "Open in Calendar") : String(localized: "Join Meeting")
+        guard let meeting = meeting(at: vm.selection) else {
+            return String(localized: "Open in Calendar")
+        }
+        return MeetingActionsMenu.primaryTitle(for: meeting)
     }
 
     private func meeting(at selection: Int) -> MeetingEvent? {
@@ -75,7 +77,9 @@ struct ScheduleScreen: PaletteScreen {
 
     /// Names why the list is empty: no access reads very differently from a free afternoon.
     private var emptyMessage: String {
-        if store.access != .granted { return String(localized: "Tinycast has no access to your calendar") }
+        if store.access != .granted, !store.joyDayEnabled {
+            return String(localized: "Tinycast has no access to your calendar")
+        }
         if !vm.query.trimmingCharacters(in: .whitespaces).isEmpty {
             return String(localized: "No matching meetings")
         }

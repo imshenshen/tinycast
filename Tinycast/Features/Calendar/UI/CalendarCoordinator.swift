@@ -242,7 +242,7 @@ final class CalendarCoordinator {
                     + (meeting.id.addingPercentEncoding(withAllowedCharacters: .alphanumerics)
                         ?? ""))!,
             bundleID: nil, kind: .meeting,
-            symbolName: meeting.link?.provider.sfSymbol ?? "calendar",
+            symbolName: meeting.meetingProvider?.sfSymbol ?? "calendar",
             keywords: [meeting.calendarName])
     }
 
@@ -346,7 +346,17 @@ final class CalendarCoordinator {
 
     func activateMeeting(id: String) {
         guard let meeting = store.event(id: id) else { return }
-        join(meeting)
+        activate(meeting)
+    }
+
+    /// Enter on an event: join it when it is a meeting, else open the one place it does live.
+    func activate(_ meeting: MeetingEvent) {
+        if meeting.canJoinMeeting || meeting.source == .eventKit {
+            join(meeting)
+        } else {
+            // JoyDay rows with no meeting still have a full details page of their own.
+            showDetails(of: meeting)
+        }
     }
 
     func meeting(entryID: String) -> MeetingEvent? {
@@ -355,12 +365,28 @@ final class CalendarCoordinator {
 
     /// `uninvited` marks an auto join, the only case that may have to ask before it acts.
     func join(_ meeting: MeetingEvent, uninvited: Bool = false) {
-        guard let link = meeting.link else {
+        if let link = meeting.link {
+            paletteCoordinator.hidePalette(restoreFocus: false)
+            Task { await joinAfterGate(meeting, link: link, uninvited: uninvited) }
+            return
+        }
+        // JoyDay lists the meeting but hides its link; the detail API has it for this occurrence.
+        guard meeting.source == .joyDay, meeting.hasOnlineMeeting else {
             openInCalendar(meeting)
             return
         }
         paletteCoordinator.hidePalette(restoreFocus: false)
-        Task { await joinAfterGate(meeting, link: link, uninvited: uninvited) }
+        Task {
+            do {
+                guard let link = try await store.resolveLink(for: meeting) else {
+                    report(String(localized: "This meeting has no link"))
+                    return
+                }
+                await joinAfterGate(meeting, link: link, uninvited: uninvited)
+            } catch {
+                report(error.localizedDescription)
+            }
+        }
     }
 
     /// The camera preview doubles as the auto join confirmation, so there is one surface, not two.
@@ -391,10 +417,30 @@ final class CalendarCoordinator {
     }
 
     func copyLink(_ meeting: MeetingEvent) {
-        guard let link = meeting.link else {
+        if let link = meeting.link {
+            copy(link)
+            return
+        }
+        guard meeting.source == .joyDay, meeting.hasOnlineMeeting else {
             report(String(localized: "This meeting has no link"))
             return
         }
+        paletteCoordinator.hidePalette(restoreFocus: false)
+        Task {
+            do {
+                guard let link = try await store.resolveLink(for: meeting) else {
+                    report(String(localized: "This meeting has no link"))
+                    return
+                }
+                Paster.copyPlainText(link.url.absoluteString)
+                core.showMessage(String(localized: "Meeting link copied"))
+            } catch {
+                report(error.localizedDescription)
+            }
+        }
+    }
+
+    private func copy(_ link: MeetingLink) {
         paletteCoordinator.hidePalette(restoreFocus: false)
         Paster.copyPlainText(link.url.absoluteString)
         core.showMessage(String(localized: "Meeting link copied"))
@@ -409,10 +455,16 @@ final class CalendarCoordinator {
         paletteCoordinator.togglePalette(mode: .schedule)
     }
 
-    /// Loaded before the push, so the page's first frame is already filled.
+    /// Loaded before the push, so the page's first frame is already filled. JoyDay answers
+    /// asynchronously through the same page, with a loading state until its detail lands.
     func showDetails(of meeting: MeetingEvent) {
         store.loadDetails(of: meeting)
-        paletteCoordinator.navigate(to: .meetingDetails)
+        if paletteCoordinator.isVisible {
+            paletteCoordinator.navigate(to: .meetingDetails)
+        } else {
+            // The menu bar can open a details page with no palette on screen.
+            paletteCoordinator.showPalette(mode: .meetingDetails)
+        }
     }
 
     /// A miss is transient, so it reports through the HUD rather than a dialog needing dismissal.

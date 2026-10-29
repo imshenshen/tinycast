@@ -748,10 +748,11 @@ struct CalendarTests {
         isDeclined: Bool = false, link: MeetingLink? = MeetingLink.detect(in: "https://example.com/x")
     ) -> MeetingEvent {
         MeetingEvent(
-            id: id, title: id, start: at(minutes),
+            id: id, source: .eventKit, title: id, start: at(minutes),
             end: at(minutes).addingTimeInterval(TimeInterval(duration * 60)),
             isAllDay: isAllDay, isDeclined: isDeclined, calendarID: "cal", calendarName: "Work",
-            calendarColor: nil, calendarItemID: id, link: link)
+            calendarColor: nil, calendarItemID: id, link: link, hasOnlineMeeting: false,
+            joyDay: nil)
     }
 
     static func event(
@@ -759,10 +760,11 @@ struct CalendarTests {
         link: MeetingLink? = MeetingLink.detect(in: "https://example.com/x")
     ) -> MeetingEvent {
         MeetingEvent(
-            id: id, title: id, start: start,
+            id: id, source: .eventKit, title: id, start: start,
             end: start.addingTimeInterval(TimeInterval(duration * 60)),
             isAllDay: false, isDeclined: false, calendarID: "cal", calendarName: "Work",
-            calendarColor: nil, calendarItemID: id, link: link)
+            calendarColor: nil, calendarItemID: id, link: link, hasOnlineMeeting: false,
+            joyDay: nil)
     }
 
     static func expect(_ condition: Bool, _ label: String) {

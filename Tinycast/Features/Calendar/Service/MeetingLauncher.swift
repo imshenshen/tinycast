@@ -40,14 +40,18 @@ enum MeetingLauncher {
             .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
-    /// Calendar.app's own handle; a recurring occurrence opens its series.
+    /// Calendar.app's own handle; a recurring occurrence opens its series. JoyDay focuses its page.
     @MainActor
     @discardableResult
     static func showInCalendar(_ event: MeetingEvent) -> Bool {
         let workspace = NSWorkspace.shared
-        guard
-            let url = URL(
-                string: "ical://ekevent/\(event.calendarItemID)?method=show&options=more")
+        if event.source == .joyDay {
+            // JoyDay is signed in inside 京ME, so the page there is the only useful destination.
+            Task { try? await JoyDayBridge.focusCalendar() }
+            return true
+        }
+        guard let itemID = event.calendarItemID,
+            let url = URL(string: "ical://ekevent/\(itemID)?method=show&options=more")
         else { return false }
         // The default calendar app owns webcal; only Calendar.app reads ical:// links.
         if let webcal = URL(string: "webcal://"), let app = workspace.urlForApplication(toOpen: webcal),

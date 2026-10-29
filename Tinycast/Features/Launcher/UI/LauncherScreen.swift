@@ -157,9 +157,7 @@ struct LauncherScreen: PaletteScreen {
         switch row(at: clampedSelection) {
         case .calc: return String(localized: "Copy Answer")
         case .color: return String(localized: "Copy Color")
-        case .meeting(let meeting):
-            return meeting.link == nil
-                ? String(localized: "Open in Calendar") : String(localized: "Join Meeting")
+        case .meeting(let meeting): return MeetingActionsMenu.primaryTitle(for: meeting)
         case .entry(let app): return app.kind.descriptor.openVerb.resolved()
         case .file(let result):
             return result.isDirectory ? String(localized: "Open Folder") : String(localized: "Open File")

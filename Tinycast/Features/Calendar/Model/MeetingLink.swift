@@ -95,6 +95,8 @@ extension MeetingLink {
         case gotoMeeting
         case blueJeans
         case skype
+        /// JD's own meeting service, which opens the 京ME desktop app from a `jdme://` link.
+        case jdMeeting
         /// Any other http(s) link the event carries — joinable, just not identifiable.
         case generic
 
@@ -110,6 +112,7 @@ extension MeetingLink {
             case .gotoMeeting: return "GoTo Meeting"
             case .blueJeans: return "BlueJeans"
             case .skype: return "Skype"
+            case .jdMeeting: return "京ME Meeting"
             case .generic: return String(localized: "Meeting Link")
             }
         }
@@ -128,7 +131,8 @@ extension MeetingLink {
             .chime: ["chime.aws"],
             .gotoMeeting: ["gotomeeting.com", "gotomeet.me", "app.goto.com"],
             .blueJeans: ["bluejeans.com"],
-            .skype: ["join.skype.com"]
+            .skype: ["join.skype.com"],
+            .jdMeeting: ["joymeeting.jd.com", "meeting.jd.com", "jdmeeting.com"]
         ]
 
         init?(host: String) {
@@ -149,7 +153,8 @@ extension MeetingLink {
                 return segments.count == 1 && segments[0] != "tel"
             case .teams:
                 return segments.contains("meetup-join") || segments.contains("meet")
-            case .webex, .jitsi, .whereby, .chime, .gotoMeeting, .blueJeans, .skype, .generic:
+            case .webex, .jitsi, .whereby, .chime, .gotoMeeting, .blueJeans, .skype, .jdMeeting,
+                .generic:
                 return !segments.isEmpty
             }
         }
@@ -173,11 +178,12 @@ extension MeetingLink {
             return components.url
         }
 
-        /// Only the two rewrites Apple's handlers make unambiguous; anything else opens the web.
+        /// Only the rewrites Apple's handlers make unambiguous; anything else opens the web.
         func appURL(for url: URL) -> URL? {
             switch self {
             case .zoom: return zoomAppURL(for: url)
             case .teams: return teamsAppURL(for: url)
+            case .jdMeeting: return url.scheme?.lowercased() == "jdme" ? url : nil
             default: return nil
             }
         }

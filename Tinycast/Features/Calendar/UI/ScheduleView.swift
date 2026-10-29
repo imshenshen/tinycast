@@ -80,7 +80,8 @@ private struct MeetingRow: View {
     var body: some View {
         HStack(spacing: metrics.spacing.lg) {
             SymbolImage(
-                name: meeting.link?.provider.sfSymbol ?? "calendar", size: metrics.size.resultRowIcon * 0.7
+                name: meeting.meetingProvider?.sfSymbol ?? "calendar",
+                size: metrics.size.resultRowIcon * 0.7
             )
             .frame(width: metrics.size.resultRowIcon, height: metrics.size.resultRowIcon)
             .foregroundStyle(meeting.isInProgress(now: now) ? Theme.Colors.brand : .secondary)

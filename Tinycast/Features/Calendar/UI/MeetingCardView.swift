@@ -9,7 +9,7 @@ struct MeetingCard: View {
     var body: some View {
         HStack(spacing: metrics.spacing.xl) {
             SymbolImage(
-                name: meeting.link?.provider.sfSymbol ?? "calendar",
+                name: meeting.meetingProvider?.sfSymbol ?? "calendar",
                 size: metrics.size.headerIconSlot
             )
             .foregroundStyle(.secondary)
@@ -50,7 +50,7 @@ struct MeetingCard: View {
 
     private var subtitle: String {
         let time = MeetingTimeFormat.range(of: meeting)
-        guard let provider = meeting.link?.provider else { return time }
+        guard let provider = meeting.meetingProvider else { return time }
         return "\(time) · \(provider.title)"
     }
 }
@@ -80,7 +80,9 @@ enum MeetingActionsMenu {
         meeting: MeetingEvent, core: AppCore, offersDetails: Bool = true
     ) -> PopoverMenuContent {
         var items: [PopoverMenuItem] = []
-        if meeting.link != nil {
+        // A JoyDay row names its online meeting before its link is fetched, so both count.
+        let canJoin = meeting.canJoinMeeting
+        if canJoin {
             items.append(
                 PopoverMenuItem(
                     title: String(localized: "Join Meeting"), systemImage: "video.fill", shortcut: "↵"
@@ -96,15 +98,18 @@ enum MeetingActionsMenu {
         }
         items.append(
             PopoverMenuItem(
-                title: String(localized: "Open in Calendar"), systemImage: "calendar", startsSection: true,
-                shortcut: meeting.link == nil ? "↵" : "⌘O"
+                title: meeting.source == .joyDay
+                    ? String(localized: "Open in 京ME") : String(localized: "Open in Calendar"),
+                systemImage: "calendar", startsSection: true,
+                shortcut: !canJoin && meeting.source == .eventKit ? "↵" : "⌘O"
             ) {
                 core.calendarCoordinator.openInCalendar(meeting)
             })
         if offersDetails {
             items.append(
                 PopoverMenuItem(
-                    title: String(localized: "Show Details"), systemImage: "info.circle", shortcut: "⌘I"
+                    title: String(localized: "Show Details"), systemImage: "info.circle",
+                    shortcut: !canJoin && meeting.source == .joyDay ? "↵" : "⌘I"
                 ) {
                     core.calendarCoordinator.showDetails(of: meeting)
                 })
@@ -112,9 +117,23 @@ enum MeetingActionsMenu {
         return PopoverMenuContent(header: meeting.title, items: items)
     }
 
+    /// The pill over a row, naming what ↵ there does: join, or open the one page that has it.
+    static func primaryTitle(for meeting: MeetingEvent) -> String {
+        if meeting.canJoinMeeting { return String(localized: "Join Meeting") }
+        return meeting.source == .joyDay
+            ? String(localized: "Show Details") : String(localized: "Open in Calendar")
+    }
+
+    /// The details page's pill: ↵ there joins, or hands the occurrence to the page that owns it.
+    static func detailsPrimaryTitle(for meeting: MeetingEvent) -> String {
+        if meeting.canJoinMeeting { return String(localized: "Join Meeting") }
+        return meeting.source == .joyDay
+            ? String(localized: "Open in 京ME") : String(localized: "Open in Calendar")
+    }
+
     /// ⌘↵ — false for a meeting with no link, leaving the key unhandled.
     static func secondary(meeting: MeetingEvent, core: AppCore) -> Bool {
-        guard meeting.link != nil else { return false }
+        guard meeting.canJoinMeeting else { return false }
         core.calendarCoordinator.copyLink(meeting)
         return true
     }

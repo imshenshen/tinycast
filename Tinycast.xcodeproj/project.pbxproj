@@ -402,6 +402,8 @@
 		73C3912866D29C26E4CED1D2 /* AIModelSelectionRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D1EA2460590C49B4A66C64 /* AIModelSelectionRows.swift */; };
 		73CD3D94F57F1A1DEF7FD3AB /* RoomWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332C754034F4F575C155E7AB /* RoomWindow.swift */; };
 		743C70ACA40F61F635DB0B55 /* CalendarStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0A2005448E6F88C3F78489 /* CalendarStore.swift */; };
+		8B2D6F0C3E5A71890B1C2D3E /* JoyDayClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1C5E9B2D4F60798A0B1C2D /* JoyDayClient.swift */; };
+		AD4F812E506C93A12D3E4F50 /* JoyDayEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3E701D4F5B82901C2D3E4F /* JoyDayEvents.swift */; };
 		74BE9E8319C8302EF525E6B2 /* QuicklinkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685FB7FD7E4E5BE6606440D0 /* QuicklinkStore.swift */; };
 		753FEBB891DBCE13C4C59935 /* AIConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE1B6753513C787B3FFE423 /* AIConnection.swift */; };
 		7553B38E8B1C40EF4945EDF1 /* ModifierKeyDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B5E917A4EFDC153C6780E8 /* ModifierKeyDetector.swift */; };
@@ -1149,6 +1151,8 @@
 		46762A28D73339953019C0AA /* ExtensionsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionsSettingsView.swift; sourceTree = "<group>"; };
 		46BFB9B782512C1D142F32F3 /* CustomCommandPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCommandPreview.swift; sourceTree = "<group>"; };
 		46C117C966BC2990F19E00AB /* MeetingLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingLauncher.swift; sourceTree = "<group>"; };
+		7A1C5E9B2D4F60798A0B1C2D /* JoyDayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoyDayClient.swift; sourceTree = "<group>"; };
+		9C3E701D4F5B82901C2D3E4F /* JoyDayEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoyDayEvents.swift; sourceTree = "<group>"; };
 		46CECB81C669337C8E6CF7FF /* ExtensionStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionStorage.swift; sourceTree = "<group>"; };
 		46F3D4D06C13288911E8D135 /* UpdateCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCoordinator.swift; sourceTree = "<group>"; };
 		471E1C3C250FD0A89E2C6430 /* ExtensionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionListView.swift; sourceTree = "<group>"; };
@@ -2558,6 +2562,8 @@
 			isa = PBXGroup;
 			children = (
 				9D0A2005448E6F88C3F78489 /* CalendarStore.swift */,
+				7A1C5E9B2D4F60798A0B1C2D /* JoyDayClient.swift */,
+				9C3E701D4F5B82901C2D3E4F /* JoyDayEvents.swift */,
 				474E6D9830E336752C79F461 /* MeetingClock.swift */,
 				46C117C966BC2990F19E00AB /* MeetingLauncher.swift */,
 			);
@@ -4137,6 +4143,8 @@
 				B89F00C65C0A01F4BFDB702F /* CalendarMenuBarItem.swift in Sources */,
 				D4AC94686EEEF4B792B58593 /* CalendarSettingsView.swift in Sources */,
 				743C70ACA40F61F635DB0B55 /* CalendarStore.swift in Sources */,
+				8B2D6F0C3E5A71890B1C2D3E /* JoyDayClient.swift in Sources */,
+				AD4F812E506C93A12D3E4F50 /* JoyDayEvents.swift in Sources */,
 				279F586CC34205EBA8ACA892 /* CalloutPlacement.swift in Sources */,
 				80E77985425032856DEECDFD /* CalloutShape.swift in Sources */,
 				B277075C16A5641C8F3E58C6 /* CameraAccess.swift in Sources */,

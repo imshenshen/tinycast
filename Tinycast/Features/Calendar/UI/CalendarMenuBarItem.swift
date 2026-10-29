@@ -12,7 +12,7 @@ struct CalendarMenuBarLabel: View {
         case (.disabled, _):
             EmptyView()
         case (.meetingIcon, let meeting?):
-            icon(meeting.link?.provider.sfSymbol ?? "calendar", describing: meeting.title)
+            icon(meeting.meetingProvider?.sfSymbol ?? "calendar", describing: meeting.title)
         case (.meetingTitle, let meeting?):
             HStack(spacing: Theme.Spacing.xs) {
                 if let color = meeting.calendarColor {
@@ -51,12 +51,19 @@ struct CalendarMenuBarMenu: View {
             let coordinator = AppCore.shared.calendarCoordinator
             if let meeting = coordinator.menuBarEvent {
                 Section {
-                    if let link = meeting.link {
-                        Button("Join \(meeting.title)", systemImage: link.provider.sfSymbol) {
+                    if meeting.canJoinMeeting {
+                        Button(
+                            "Join \(meeting.title)",
+                            systemImage: meeting.meetingProvider?.sfSymbol ?? "video.fill"
+                        ) {
                             coordinator.join(meeting)
                         }
                     }
-                    Button("Open in Calendar", systemImage: "calendar") {
+                    Button(
+                        meeting.source == .joyDay
+                            ? String(localized: "Open in 京ME") : String(localized: "Open in Calendar"),
+                        systemImage: "calendar"
+                    ) {
                         coordinator.openInCalendar(meeting)
                     }
                     Button("Dismiss Event", systemImage: "xmark.circle") {
@@ -87,7 +94,7 @@ private struct MenuBarAgenda: View {
             Section(group.day.title(calendar: .current)) {
                 ForEach(group.meetings) { meeting in
                     Button {
-                        AppCore.shared.calendarCoordinator.join(meeting)
+                        AppCore.shared.calendarCoordinator.activate(meeting)
                     } label: {
                         Label {
                             Text(verbatim: "\(MeetingTimeFormat.range(of: meeting)) \(meeting.title)")

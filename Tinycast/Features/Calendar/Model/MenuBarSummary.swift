@@ -32,7 +32,7 @@ struct MenuBarSummary: Sendable {
         from events: [MeetingEvent], now: Date, dismissed: Set<MeetingEvent.ID> = []
     ) -> MeetingEvent? {
         UpcomingWindow.agenda(from: events, now: now).first {
-            !dismissed.contains($0.id) && (!linkedOnly || $0.link != nil)
+            !dismissed.contains($0.id) && (!linkedOnly || $0.canJoinMeeting)
                 && isInsideLead(for: $0, now: now) && now < hidesAt($0)
         }
     }

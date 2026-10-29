@@ -16,14 +16,14 @@ struct UpcomingWindow: Sendable {
     /// The grace period never outlives the meeting, so a stand-up clears at its end.
     func carded(from events: [MeetingEvent], now: Date) -> MeetingEvent? {
         Self.agenda(from: events, now: now).first {
-            $0.link != nil && now >= $0.start - lead && now < min($0.start + lead, $0.end)
+            $0.canJoinMeeting && now >= $0.start - lead && now < min($0.start + lead, $0.end)
         }
     }
 
     /// Answers the card first, so the chord always joins what is on screen.
     func joinable(from events: [MeetingEvent], now: Date) -> MeetingEvent? {
         if let carded = carded(from: events, now: now) { return carded }
-        let linked = Self.agenda(from: events, now: now).filter { $0.link != nil }
+        let linked = Self.agenda(from: events, now: now).filter { $0.canJoinMeeting }
         return linked.first { $0.isInProgress(now: now) } ?? linked.first { $0.start > now }
     }
 

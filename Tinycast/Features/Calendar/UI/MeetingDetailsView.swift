@@ -8,7 +8,7 @@ struct MeetingDetailsView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: metrics.spacing.md) {
-                header
+                MeetingDetailsHeader(meeting: meeting)
                 if let location = details.location {
                     HStack(alignment: .firstTextBaseline, spacing: metrics.spacing.sm) {
                         Image(systemName: "mappin.and.ellipse")
@@ -43,10 +43,28 @@ struct MeetingDetailsView: View {
         .id(meeting.id)
     }
 
-    private var header: some View {
+    private func sectionHeader(_ title: String) -> some View {
+        VStack(alignment: .leading, spacing: metrics.spacing.xs) {
+            Text(title)
+                .font(metrics.typography.sectionHeader)
+                .foregroundStyle(Theme.Colors.textTertiary)
+            Rectangle()
+                .fill(Theme.Colors.separator)
+                .frame(height: 1)
+        }
+        .padding(.top, metrics.spacing.xl)
+    }
+}
+
+/// The page's head. Shared with the loading and failure states so its title never jumps.
+struct MeetingDetailsHeader: View {
+    @Environment(\.metrics) private var metrics
+    let meeting: MeetingEvent
+
+    var body: some View {
         HStack(spacing: metrics.spacing.xl) {
             SymbolImage(
-                name: meeting.link?.provider.sfSymbol ?? "calendar",
+                name: meeting.meetingProvider?.sfSymbol ?? "calendar",
                 size: metrics.size.headerIconSlot
             )
             .foregroundStyle(.secondary)
@@ -66,18 +84,6 @@ struct MeetingDetailsView: View {
     private var subtitle: String {
         let day = UpcomingWindow.dayLabel(meeting.start, calendar: .current)
         return "\(day) · \(MeetingTimeFormat.range(of: meeting)) · \(meeting.calendarName)"
-    }
-
-    private func sectionHeader(_ title: String) -> some View {
-        VStack(alignment: .leading, spacing: metrics.spacing.xs) {
-            Text(title)
-                .font(metrics.typography.sectionHeader)
-                .foregroundStyle(Theme.Colors.textTertiary)
-            Rectangle()
-                .fill(Theme.Colors.separator)
-                .frame(height: 1)
-        }
-        .padding(.top, metrics.spacing.xl)
     }
 }
 
