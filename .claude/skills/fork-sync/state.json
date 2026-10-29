@@ -1,0 +1,11 @@
+{
+  "upstreamRemote": "upstream",
+  "upstreamBranch": "main",
+  "baseCommit": "37e6043f3f550febb64bdb3cff3ac29a30caad5a",
+  "baseTag": "v0.12.3-beta.127",
+  "lastCheck": "2026-10-29T18:09:13+08:00",
+  "lastCheckedUpstream": "37e6043f3f550febb64bdb3cff3ac29a30caad5a",
+  "pending": [],
+  "ported": [],
+  "dropped": []
+}
