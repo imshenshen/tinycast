@@ -1,13 +1,13 @@
 # Tinycast Fork 功能记录
 
-本仓库是 [tinycast](https://github.com/abue-ammar/tinycast) 的私有 fork：在保留上游启动器能力的基础上，加入京ME（JoyDay）日历与会议能力，并做了一组构建与交互修复。
+本仓库是 [tinycast](https://github.com/abue-ammar/tinycast) 的公开 fork：在保留上游启动器能力的基础上，加入京ME（JoyDay）日历与会议能力，并做了一组构建与交互修复。
 
 这份文件记录 fork 后新增/修改的功能及其涉及文件，便于上游更新时判断冲突范围。由 `.claude/skills/fork-sync` 维护。
 
 - Fork 基线：`37e6043`（上游 `v0.12.3-beta.127`，2026-10-27）
 - 上游：`upstream` / `main` — <https://github.com/abue-ammar/tinycast>（只读）
 - Fork 仓库：`origin` — <https://github.com/imshenshen/tinycast>（推送目标）
-- 当前分支：`feat/jd-calendar`；fork 改动目前尚未提交（都在工作区）
+- 当前分支：`feat/jd-calendar`（已推送到 `origin`）；`main` 保持与上游一致
 - 最后更新：2026-10-29
 - 最近上游检查：2026-10-29T18:09:13+08:00（上游仍为基线，无新提交；以 state.json 为准）
 - 上游检查时间与待处理清单：见 `.claude/skills/fork-sync/state.json`
