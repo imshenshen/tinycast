@@ -106,6 +106,9 @@ enum SettingsBackupCoverage {
             + "something else there.",
         AppSettingsKey.extensionsEnabled.rawValue:
             "Doubles as consent to run third-party JavaScript; an import must not switch it on.",
+        AppSettingsKey.pinPalette.rawValue:
+            "A panel that stays afloat is a decision made at the Mac in front of it; an import must "
+            + "not leave it open over another one.",
         AppSettingsKey.palettePosition.rawValue:
             "Machine-local geometry: every entry names a display this Mac has, and no other one.",
         AppSettingsKey.paletteExpandedCenterDisplays.rawValue:

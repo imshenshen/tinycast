@@ -18,6 +18,7 @@ enum SettingsFileKey: String, CaseIterable, Sendable {
     case compactBarCommands = "appearance.compactBarCommands"
     case openOnCursorScreen = "appearance.followCursorAcrossDisplays"
     case paletteDraggable = "appearance.dragToReposition"
+    case pinPalette = "appearance.pinPalette"
     case hyperKey = "hyperKey.key"
     case hyperKeyIncludesShift = "hyperKey.includesShift"
     case hyperKeyQuickPress = "hyperKey.quickPress"

@@ -273,6 +273,11 @@ final class AppSettings {
         didSet { defaults.set(paletteDraggable, forKey: Key.paletteDraggable.rawValue) }
     }
 
+    /// Keeps the panel on screen when another app takes the keyboard, so it can stay up beside one.
+    var pinPalette: Bool {
+        didSet { defaults.set(pinPalette, forKey: Key.pinPalette.rawValue) }
+    }
+
     /// Off, every surface changes at once; on, Reduce Motion still trims movement where it did.
     var animationsEnabled: Bool {
         didSet { defaults.set(animationsEnabled, forKey: Key.animationsEnabled.rawValue) }
@@ -753,6 +758,7 @@ final class AppSettings {
             || defaults.bool(forKey: Key.openOnCursorScreen.rawValue)
         autoSwitchInputSourceID = defaults.string(forKey: Key.autoSwitchInputSource.rawValue)
         paletteDraggable = defaults.bool(forKey: Key.paletteDraggable.rawValue)
+        pinPalette = defaults.bool(forKey: Key.pinPalette.rawValue)
         animationsEnabled =
             defaults.object(forKey: Key.animationsEnabled.rawValue) == nil
             || defaults.bool(forKey: Key.animationsEnabled.rawValue)

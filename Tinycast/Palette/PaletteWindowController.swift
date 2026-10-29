@@ -240,6 +240,8 @@ final class PaletteWindowController: NSObject, NSWindowDelegate {
             panel?.level = .normal
             return
         }
+        // Pinned, the panel outlives the keyboard: another app may be frontmost and it stays up.
+        if core.settings.pinPalette { return }
         core.paletteCoordinator.hidePalette(restoreFocus: false)
     }
 

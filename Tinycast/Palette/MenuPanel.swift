@@ -134,7 +134,8 @@ final class MenuPanelController {
     ) {
         panel.onKeyDown = onKeyDown
         panel.onResignKey = { [weak core] stayedInPalette in
-            if stayedInPalette {
+            // Pinned, losing focus only closes the menu; the palette beneath it stays up.
+            if stayedInPalette || core?.settings.pinPalette == true {
                 onDismiss()
             } else {
                 core?.paletteCoordinator.hidePalette(restoreFocus: false)

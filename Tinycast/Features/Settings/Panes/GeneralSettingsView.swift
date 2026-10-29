@@ -94,6 +94,10 @@ struct GeneralSettingsView: View {
                     SettingsRowTitle(.generalAppearance, "Drag to move the launcher")
                     Text("Move the launcher by dragging the search bar.")
                 }
+                Toggle(isOn: $settings.pinPalette) {
+                    SettingsRowTitle(.generalAppearance, "Pin the launcher")
+                    Text("Keeps the launcher open while you work in another app.")
+                }
             } header: {
                 SettingsSectionHeader(.generalAppearance)
             }

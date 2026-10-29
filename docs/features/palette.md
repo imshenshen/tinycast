@@ -331,6 +331,16 @@ and the controller holds a `DragSession` for exactly that span. **Only a move in
 programmatic resize would be recorded as one. Starting that session gives one haptic tick; a click
 without a drag does not.
 
+### Pin
+
+**Pin the launcher** (`AppSettings.pinPalette`, off by default) keeps the panel up when another app
+takes the keyboard: `PaletteWindowController.windowDidResignKey` returns before hiding while it is on,
+so a click in another app leaves the panel floating where it was. Every explicit dismissal still
+hides it — Escape, ⌘W, the hotkey, and any command that acts on another app — because those call
+`hidePalette` directly rather than going through the focus path. A menu that is open when focus
+leaves is dismissed without tearing the palette down, so `MenuPanel` closes and the panel beneath it
+stays. The pin sits beside the footer's actions, and the same switch is in General › Appearance.
+
 ### Drop guides and snapping
 
 During a drag, `PaletteDropGuideController` shows the original three dotted guides: both edges of

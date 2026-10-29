@@ -386,8 +386,13 @@ struct RootPaletteView: View {
     }
 
     /// Split from `body` for the same reason `keyHandlers` is: one chain cannot carry them all.
-    @ViewBuilder
     private func stateObservers(_ content: some View) -> some View {
+        modeObservers(queryObservers(content))
+    }
+
+    /// Split again for Swift 6.2: one chain of this length is past what the type-checker will infer.
+    @ViewBuilder
+    private func queryObservers(_ content: some View) -> some View {
         emojiObservers(content)
             // Every show bumps focusToken so the search field refocuses.
             .onChange(of: vm.focusToken) {
@@ -403,20 +408,7 @@ struct RootPaletteView: View {
             }
             // A preserved screen re-summons as it was left, so a menu must end with the palette.
             .modifier(PaletteHideObserver { if menuOpen { closeMenus() } })
-            .onChange(of: vm.query) {
-                resetCompactSelection()
-                if vm.collapseQueryLineBreaks() { return }
-                land(restoringSelection: true)
-                if vm.mode == .fileSearch { fileSearch.search(vm.query, filter: vm.fileSearchFilter) }
-                if vm.mode == .launcher { core.fileSearchCoordinator.searchFromLauncher(vm.query) }
-                if vm.mode == .dictionary { dictionary.lookUp(vm.query) }
-                if vm.mode == .menuSearch { menuSearch.filter(vm.query) }
-                if vm.mode == .switchWindows { windowSwitch.filter(vm.query) }
-                // A command that took over the search text filters its own list.
-                if vm.mode == .extensionCommand, let handler = extensionScreen.searchTextHandler {
-                    extensions.dispatch(handler: handler, arguments: [vm.query])
-                }
-            }
+            .onChange(of: vm.query) { queryChanged() }
             // Anything typed while the command was still starting predates its handler.
             .onChange(of: extensionScreen.searchTextHandler) { previous, handler in
                 guard previous == nil, let handler, !vm.query.isEmpty else { return }
@@ -430,37 +422,13 @@ struct RootPaletteView: View {
                 land()
                 fileSearch.search(vm.query, filter: vm.fileSearchFilter)
             }
-            .onChange(of: vm.mode) {
-                vm.clipboardFilter = .all
-                vm.fileSearchFilter = .all
-                vm.emojiCategoryFilter = .all
-                vm.emojiGridColumnsOverride = nil
-                if menuOpen { closeMenus() }
-                land(restoringSelection: true)
-                searchFocused = !screen.hidesSearchField
-                if vm.mode != .uninstall { uninstall.cancel() }
-                // Entering with no query is the blank screen's own request for recents.
-                if vm.mode == .fileSearch {
-                    fileSearch.search(vm.query, filter: vm.fileSearchFilter)
-                } else if vm.mode == .launcher {
-                    core.fileSearchCoordinator.searchFromLauncher(vm.query)
-                } else {
-                    fileSearch.cancel()
-                }
-                if vm.mode == .dictionary {
-                    dictionary.lookUp(vm.query)
-                } else {
-                    dictionary.reset()
-                }
-                if vm.mode != .menuSearch { menuSearch.reset() }
-                if vm.mode != .switchWindows { windowSwitch.reset() }
-                if vm.mode != .meetingDetails { calendarStore.clearDetails() }
-                if vm.mode != .rooms, vm.mode != .roomWindows { core.roomCoordinator.screensDidClose() }
-                // Leaving the screen any other way than Escape still ends the command's session.
-                if vm.mode != .extensionCommand, extensions.running != nil {
-                    Task { await extensions.stop() }
-                }
-            }
+    }
+
+    /// Split again for Swift 6.2: one chain of this length is past what the type-checker will infer.
+    @ViewBuilder
+    private func modeObservers(_ content: some View) -> some View {
+        content
+            .onChange(of: vm.mode) { modeChanged() }
             // `prepare` may change nothing else, so this still lands the list as freshly opened.
             .onChange(of: vm.resetToken) {
                 if menuOpen { closeMenus() }
@@ -501,6 +469,55 @@ struct RootPaletteView: View {
                 resetCompactSelection()
                 core.paletteCoordinator.syncPaletteSize()
             }
+    }
+
+    /// Extracted from the observer chain: Swift 6.2's type-checker times out on the closure inline.
+    private func queryChanged() {
+        resetCompactSelection()
+        if vm.collapseQueryLineBreaks() { return }
+        land(restoringSelection: true)
+        if vm.mode == .fileSearch { fileSearch.search(vm.query, filter: vm.fileSearchFilter) }
+        if vm.mode == .launcher { core.fileSearchCoordinator.searchFromLauncher(vm.query) }
+        if vm.mode == .dictionary { dictionary.lookUp(vm.query) }
+        if vm.mode == .menuSearch { menuSearch.filter(vm.query) }
+        if vm.mode == .switchWindows { windowSwitch.filter(vm.query) }
+        // A command that took over the search text filters its own list.
+        if vm.mode == .extensionCommand, let handler = extensionScreen.searchTextHandler {
+            extensions.dispatch(handler: handler, arguments: [vm.query])
+        }
+    }
+
+    /// Extracted from the observer chain: Swift 6.2's type-checker times out on the closure inline.
+    private func modeChanged() {
+        vm.clipboardFilter = .all
+        vm.fileSearchFilter = .all
+        vm.emojiCategoryFilter = .all
+        vm.emojiGridColumnsOverride = nil
+        if menuOpen { closeMenus() }
+        land(restoringSelection: true)
+        searchFocused = !screen.hidesSearchField
+        if vm.mode != .uninstall { uninstall.cancel() }
+        // Entering with no query is the blank screen's own request for recents.
+        if vm.mode == .fileSearch {
+            fileSearch.search(vm.query, filter: vm.fileSearchFilter)
+        } else if vm.mode == .launcher {
+            core.fileSearchCoordinator.searchFromLauncher(vm.query)
+        } else {
+            fileSearch.cancel()
+        }
+        if vm.mode == .dictionary {
+            dictionary.lookUp(vm.query)
+        } else {
+            dictionary.reset()
+        }
+        if vm.mode != .menuSearch { menuSearch.reset() }
+        if vm.mode != .switchWindows { windowSwitch.reset() }
+        if vm.mode != .meetingDetails { calendarStore.clearDetails() }
+        if vm.mode != .rooms, vm.mode != .roomWindows { core.roomCoordinator.screensDidClose() }
+        // Leaving the screen any other way than Escape still ends the command's session.
+        if vm.mode != .extensionCommand, extensions.running != nil {
+            Task { await extensions.stop() }
+        }
     }
 
     /// Split from `body`: one chain of this length is past what the type-checker will infer.
@@ -976,14 +993,13 @@ struct RootPaletteView: View {
         HStack(spacing: 0) {
             appMenuButton
                 .modifier(ExtensionToastSlot(extensions: extensions, showing: vm.mode == .extensionCommand))
-            if showActionGroup {
-                actionGroup(
-                    pillLabel: pillLabel, formPrimaryShortcut: formPrimaryShortcut,
-                    primaryActionEnabled: primaryActionEnabled,
-                    showActions: showActions
-                )
-                .fixedSize()
-            }
+            actionGroup(
+                pillLabel: pillLabel, showsPill: showActionGroup,
+                formPrimaryShortcut: formPrimaryShortcut,
+                primaryActionEnabled: primaryActionEnabled,
+                showActions: showActions
+            )
+            .fixedSize()
         }
         .padding(.horizontal, metrics.spacing.md)
         .frame(height: metrics.size.bottomBarHeight)
@@ -997,26 +1013,29 @@ struct RootPaletteView: View {
     }
 
     private func actionGroup(
-        pillLabel: String, formPrimaryShortcut: Bool, primaryActionEnabled: Bool, showActions: Bool
+        pillLabel: String, showsPill: Bool, formPrimaryShortcut: Bool,
+        primaryActionEnabled: Bool, showActions: Bool
     ) -> some View {
         HStack(spacing: 2) {
-            BarButton(action: activateSelection) {
-                HStack(spacing: metrics.spacing.sm) {
-                    Text(pillLabel)
-                        .font(metrics.typography.bar)
-                        .foregroundStyle(pillTint)
-                    if formPrimaryShortcut {
-                        HStack(spacing: metrics.spacing.xxs) {
-                            KeyCapChip(text: "⌘", style: .outline)
+            if showsPill {
+                BarButton(action: activateSelection) {
+                    HStack(spacing: metrics.spacing.sm) {
+                        Text(pillLabel)
+                            .font(metrics.typography.bar)
+                            .foregroundStyle(pillTint)
+                        if formPrimaryShortcut {
+                            HStack(spacing: metrics.spacing.xxs) {
+                                KeyCapChip(text: "⌘", style: .outline)
+                                KeyCapChip(text: "↵", style: .outline)
+                            }
+                        } else {
                             KeyCapChip(text: "↵", style: .outline)
                         }
-                    } else {
-                        KeyCapChip(text: "↵", style: .outline)
                     }
                 }
+                .disabled(!primaryActionEnabled)
             }
-            .disabled(!primaryActionEnabled)
-            if showActions {
+            if showsPill, showActions {
                 BarButton(action: toggleActions) {
                     HStack(spacing: metrics.spacing.sm) {
                         Text("Actions")
@@ -1029,9 +1048,32 @@ struct RootPaletteView: View {
                     }
                 }
             }
+            // The pin stands beside the actions: it belongs to the panel, not to the selection.
+            BarButton(isSelected: settings.pinPalette, action: togglePin) {
+                Image(systemName: settings.pinPalette ? "pin.fill" : "pin")
+                    .font(metrics.typography.headerIcon)
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(
+                        settings.pinPalette
+                            ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                    .frame(width: metrics.scaled(16), height: metrics.scaled(16))
+            }
+            .help(
+                settings.pinPalette
+                    ? String(localized: "Unpin the launcher")
+                    : String(localized: "Pin the launcher"))
+            .accessibilityLabel(
+                Text(
+                    settings.pinPalette
+                        ? String(localized: "Unpin the launcher")
+                        : String(localized: "Pin the launcher")))
         }
         .padding(metrics.spacing.xs)
         .frosted(in: Capsule())
+    }
+
+    private func togglePin() {
+        settings.pinPalette.toggle()
     }
 
     /// The one path opening the Actions menu, sampling the state its rows depend on.
