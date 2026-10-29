@@ -22,9 +22,20 @@ struct PermissionsSettingsView: View {
                         }
                         .foregroundStyle(accessibilityStatus.tint)
                         Button(accessibilityTrusted ? "Open…" : "Grant Access…") {
-                            Permissions.openAccessibilitySettings()
+                            if accessibilityTrusted {
+                                Permissions.openAccessibilitySettings()
+                            } else {
+                                // Settings lists only apps that asked, so the prompt is what adds
+                                // Tinycast to the pane; opening the pane alone leaves it missing.
+                                _ = Permissions.ensureAccessibility()
+                                Permissions.openAccessibilitySettings()
+                                refresh()
+                            }
                         }
-                        .help("Opens Privacy & Security › Accessibility.")
+                        .help(
+                            accessibilityTrusted
+                                ? "Opens Privacy & Security › Accessibility."
+                                : "Asks macOS for accessibility access, then opens Privacy & Security.")
                     }
                 } label: {
                     HStack(spacing: Theme.Spacing.lg) {
