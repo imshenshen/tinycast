@@ -8,15 +8,15 @@
   `ClipboardCoordinator.applyEnabled()` is the single place that applies it.
 - **↵, ⌘↵ and ⌃⌘↵ trade places around one setting, and
   `ClipboardDefaultAction.action(for:on:)` is the only place that says which chord runs what.**
-  Paste owns ↵, Copy ⌘↵ and Paste as Plain Text ⌃⌘↵; `clipboardDefaultAction` moves one to ↵ and
-  Paste takes the chord it left, so a Copy default keeps the ↵/⌘↵ swap it always had.
+  Paste owns ↵, Paste as Plain Text ⌘↵ and Copy ⌃⌘↵; `clipboardDefaultAction` moves one to ↵ and
+  Paste takes the chord it left, so a Copy default moves Paste to ⌃⌘↵ and a plain-text one to ⌘↵.
   `ClipboardCoordinator.activate(_:chord:)` runs it, and ⌘1…⌘0 on a pin and a double-click go
   through the same call, so no surface can drift from the setting; ⌥↵ pastes regardless, since
   keeping the window open is a paste-only idea. The ⌘K menu lists the three in chord order, which
   puts the default first with the ↵ chip.
 - **Paste as Plain Text writes `ClipboardItem.plainText` and nothing else**: the text itself, or a
-  file entry's path without its `public.file-url`. An image has none, so it gets no plain row, a
-  plain-text default pastes it as it is, and ⌃⌘↵ on it falls back to ⌘↵ as on every other screen.
+  file entry's path without its `public.file-url`. An image has none, so it gets no plain row and
+  ⌘↵ runs nothing on it; a plain-text default pastes it as it is, and ⌃⌘↵ still copies.
 - **Clipboard writes stamp a private `internalType` marker** so the poller skips Tinycast's own writes.
   If the writer and the poller ever disagree, the app re-captures its own pastes in a loop.
 - **Edit Entry rewrites a text entry in place and never adds one.** The id, pin and source app

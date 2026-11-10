@@ -44,7 +44,7 @@ enum PaletteShortcut: Equatable {
     case newItem
     /// ⌘E, the row opened in its editor.
     case edit
-    /// ⌘D.
+    /// ⌘D; Quicklinks duplicates on it, Clipboard deletes.
     case duplicate
     /// ⌘F, for a screen whose ⌘↵ already does something else.
     case showInFinder

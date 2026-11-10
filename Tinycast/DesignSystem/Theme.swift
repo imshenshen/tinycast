@@ -493,6 +493,8 @@ enum Theme {
         static let destructive = Color.red
         static let success = Color.green
         static let warning = Color.orange
+        /// A countdown inside the hour: red here reads as time running out, not as danger.
+        static let imminent = Color.red
         static let composerSend = ramp(dark: 0.92, light: 0.92)
         static let composerSendInk = adaptive(dark: .srgbInk(0, alpha: 0.85), light: .srgbInk(1, alpha: 1))
         /// The window's own page, for a card that must hide the transcript it floats over.

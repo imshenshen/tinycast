@@ -70,18 +70,20 @@ Shortcuts follow key positions, so they work the same on any keyboard layout or 
 | Key                                                 | Does                       |
 | --------------------------------------------------- | -------------------------- |
 | <kbd>return</kbd>                                   | Paste                      |
-| <kbd>⌘</kbd><kbd>return</kbd>                       | Copy to Clipboard          |
+| <kbd>⌘</kbd><kbd>return</kbd>                       | Paste as Plain Text        |
+| <kbd>⌃</kbd><kbd>⌘</kbd><kbd>return</kbd>           | Copy to Clipboard          |
 | <kbd>⌥</kbd><kbd>return</kbd>                       | Paste and Keep Window Open |
 | <kbd>⌘</kbd><kbd>P</kbd>                            | Filter by type             |
 | <kbd>⌘</kbd><kbd>.</kbd>                            | Pin / Unpin Entry          |
 | <kbd>⌘</kbd><kbd>E</kbd>                            | Edit Entry                 |
 | <kbd>⌘</kbd><kbd>F</kbd>                            | Show in Finder             |
 | <kbd>⌘</kbd><kbd>1</kbd> … <kbd>⌘</kbd><kbd>0</kbd> | Paste pinned entry 1 to 10 |
-| <kbd>⌃</kbd><kbd>X</kbd>                            | Delete Entry               |
+| <kbd>⌘</kbd><kbd>D</kbd>                            | Delete Entry               |
 | <kbd>⌃</kbd><kbd>⇧</kbd><kbd>X</kbd>                | Delete All Entries         |
 
 When **Default action** is set to Copy to Clipboard, <kbd>return</kbd> and
-<kbd>⌘</kbd><kbd>return</kbd> are swapped.
+<kbd>⌃</kbd><kbd>⌘</kbd><kbd>return</kbd> are swapped. Set it to Paste as Plain Text and
+<kbd>return</kbd> and <kbd>⌘</kbd><kbd>return</kbd> are instead.
 
 ## Emoji
 

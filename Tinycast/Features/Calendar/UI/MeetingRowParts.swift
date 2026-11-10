@@ -28,9 +28,11 @@ struct MeetingTiming: View {
                 Text(UpcomingWindow.countdown(to: now + 60 * 60, now: now, locale: .current)).hidden()
                 Text(UpcomingWindow.dayLabel(now + 24 * 60 * 60, calendar: .current)).hidden()
                 Text(pill?.text ?? "")
-                    .foregroundStyle(pill?.isImminent == true ? .primary : .secondary)
+                    .fontWeight(pill?.isImminent == true ? .bold : .medium)
+                    .foregroundStyle(pill?.isImminent == true ? Theme.Colors.imminent : .secondary)
             }
-            .font(metrics.typography.rowTrailing.weight(.medium))
+            // The slot reserves the bold width, so turning a pill red never shifts the column.
+            .font(metrics.typography.rowTrailing.weight(.bold))
             .padding(.horizontal, metrics.spacing.sm)
             .padding(.vertical, metrics.spacing.xxs)
             .background(

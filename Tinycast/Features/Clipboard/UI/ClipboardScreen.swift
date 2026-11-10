@@ -37,7 +37,7 @@ struct ClipboardScreen: PaletteScreen {
 
     func perform(_ shortcut: PaletteShortcut, at selection: Int) -> Bool {
         switch shortcut {
-        case .commandDelete, .delete:
+        case .commandDelete, .duplicate:
             delete(at: selection)
             return true
         case .deleteAll:
@@ -69,13 +69,13 @@ struct ClipboardScreen: PaletteScreen {
         return true
     }
 
-    /// ⌘↵ — the action ↵ is not set to.
+    /// ⌘↵ — Paste as Plain Text, or Paste while that is the default.
     func secondary(at selection: Int) -> Bool {
         guard let item = item(at: selection) else { return false }
         return core.clipboardCoordinator.activate(item, chord: .command)
     }
 
-    /// ⌃⌘↵ — Paste as Plain Text, or Paste while that is the default.
+    /// ⌃⌘↵ — Copy, or Paste while that is the default.
     func tertiary(at selection: Int) -> Bool {
         guard let item = item(at: selection) else { return false }
         return core.clipboardCoordinator.activate(item, chord: .controlCommand)
@@ -94,7 +94,7 @@ struct ClipboardScreen: PaletteScreen {
         return true
     }
 
-    /// ⌘⌫ / ⌃X — the screen owns the chord whether or not a row sits under the selection.
+    /// ⌘D / ⌘⌫ — the screen owns the chord whether or not a row sits under the selection.
     private func delete(at selection: Int) {
         guard let item = item(at: selection) else { return }
         store.remove(item)
@@ -239,7 +239,7 @@ enum ClipboardActionsMenu {
         items.append(
             PopoverMenuItem(
                 title: String(localized: "Delete Entry"), systemImage: "trash", startsSection: true,
-                shortcut: "⌃X", isDestructive: true
+                shortcut: "⌘D", isDestructive: true
             ) {
                 store.remove(item)
             })

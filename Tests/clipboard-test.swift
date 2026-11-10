@@ -852,15 +852,15 @@ struct ClipboardTests {
         }
     }
 
-    /// The default takes ↵ and Paste its chord; the Paste and Copy defaults keep their old pair.
+    /// The default takes ↵, Paste the chord it leaves, and Plain Text keeps ⌘↵ for itself.
     static func defaultActionChords() {
         let text = ClipboardItem(text: "hello", sourceBundleID: nil)
         let file = ClipboardItem(filePath: "/Users/me/report.pdf", sourceBundleID: nil)
         let image = ClipboardItem(imagePath: "/tmp/shot.png", sourceBundleID: nil)
         let expected: [ClipboardDefaultAction: [ClipboardDefaultAction]] = [
-            .paste: [.paste, .copy, .pastePlainText],
-            .copy: [.copy, .paste, .pastePlainText],
-            .pastePlainText: [.pastePlainText, .copy, .paste]
+            .paste: [.paste, .pastePlainText, .copy],
+            .copy: [.copy, .pastePlainText, .paste],
+            .pastePlainText: [.pastePlainText, .paste, .copy]
         ]
         for (defaultAction, actions) in expected {
             for item in [text, file] {
@@ -871,7 +871,10 @@ struct ClipboardTests {
             let imageActions = ClipboardChord.allCases.map { defaultAction.action(for: $0, on: image) }
             let paste: ClipboardDefaultAction = defaultAction == .copy ? .copy : .paste
             expect(imageActions.first == paste, "\(defaultAction) on an image never pastes plain")
-            expect(imageActions.last == .some(nil), "and ⌃⌘↵ has nothing to run on it")
+            expect(imageActions[1] == .some(nil), "and ⌘↵ has nothing to run on it")
+            expect(
+                imageActions.last == (defaultAction == .copy ? .paste : .copy),
+                "and ⌃⌘↵ copies, or pastes under a Copy default")
         }
     }
 

@@ -136,8 +136,8 @@ enum ClipboardDefaultAction: String, CaseIterable, Identifiable, Sendable {
             switch chord {
             case .return: resolved
             case resolved.ownChord: .paste
-            case .command: .copy
-            case .controlCommand: .pastePlainText
+            case .command: .pastePlainText
+            case .controlCommand: .copy
             }
         return action == .pastePlainText && !hasPlainText ? nil : action
     }
@@ -146,8 +146,8 @@ enum ClipboardDefaultAction: String, CaseIterable, Identifiable, Sendable {
     private var ownChord: ClipboardChord {
         switch self {
         case .paste: .return
-        case .copy: .command
-        case .pastePlainText: .controlCommand
+        case .copy: .controlCommand
+        case .pastePlainText: .command
         }
     }
 }
