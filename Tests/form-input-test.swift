@@ -15,10 +15,13 @@ struct FormInputTests {
 
     static func main() {
         _ = NSApplication.shared
-        testSingleLine()
-        testCapAlignment()
+        if !CommandLine.arguments.contains("--text-area") {
+            testSingleLine()
+            testCapAlignment()
+        }
         testTextArea()
         testTextAreaKeepsItsFloor()
+        testTextAreaUnboundedWidth()
         testCodeFont()
         if failures > 0 { exit(1) }
         print("Form inputs passed")
@@ -241,6 +244,30 @@ struct FormInputTests {
         window.makeFirstResponder(input)
         input.sizeToFit()
         expect(input.frame.height >= 120, "short text never shrinks the textarea below its minimum")
+    }
+
+    static func testTextAreaUnboundedWidth() {
+        let controller = NSHostingController(rootView: FormTextArea(
+            text: .constant("A wrapped textarea"), selection: .constant(nil), focused: .constant(false),
+            minimumHeight: 120, label: "Template", moveFocus: { _ in }))
+        let window = NSWindow(contentViewController: controller)
+        window.setContentSize(CGSize(width: 300, height: 120))
+        controller.view.layoutSubtreeIfNeeded()
+        defer { window.close() }
+        let maximum = controller.sizeThatFits(
+            in: CGSize(width: CGFloat.infinity, height: CGFloat.infinity))
+        let finite = controller.sizeThatFits(in: CGSize(width: 300, height: 120))
+        guard let input = find(FormTextArea.InputView.self, in: controller.view) else {
+            expect(false, "textarea mounts during an unbounded width probe")
+            return
+        }
+        expect(maximum.height.isFinite, "an unbounded probe preserves a finite textarea height")
+        expect(
+            input.frame.width.isFinite && input.frame.height.isFinite,
+            "an unbounded probe never sets the native text view's frame to infinity")
+        expect(
+            finite.width == 300 && finite.height >= 120 && finite.height.isFinite,
+            "a bounded probe still lays out the textarea after an unbounded probe")
     }
 
     static func testCodeFont() {

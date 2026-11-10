@@ -33,6 +33,12 @@ Or from the command line:
 xcodebuild -project Tinycast.xcodeproj -scheme Tinycast -configuration Debug build
 ```
 
+A command-line build updates only its DerivedData product. It does not replace or restart
+`/Applications/Tinycast Dev.app`; a shortcut can still summon that older copy. To run the changes,
+quit the existing Dev process, copy the complete newly built app bundle into its installed location,
+then reopen that exact path. Compare the running process's bundle path and the executable's build
+time when a fix appears to have disappeared.
+
 `xcodebuild` uses whatever `xcode-select` points at; if that's the Command Line Tools rather than
 Xcode, prefix with `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` (the SwiftUI
 `@State`/`@FocusState` macros need Xcode's macOS platform).

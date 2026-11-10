@@ -164,7 +164,19 @@
       ],
       "overlap": [],
       "stat": "1 file changed, 1 insertion(+), 1 deletion(-)",
-      "firstSeen": "2026-11-10T21:24:00+08:00"
+      "firstSeen": "2026-11-10T21:24:00+08:00",
+      "implementation": {
+        "status": "applied-awaiting-validation",
+        "appliedAt": "2026-11-10T21:52:52+08:00",
+        "note": "已移植搜索范围可选择文件夹。",
+        "validation": {
+          "debugBuild": "passed; no new compiler warnings",
+          "lint": "passed",
+          "focusedTextArea": "passed",
+          "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
+          "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
+        }
+      }
     },
     {
       "sha": "10421dd8b5fa02356ee1edc5d085200c687b015c",
@@ -197,7 +209,19 @@
         "docs/features/palette.md"
       ],
       "stat": "2 files changed, 12 insertions(+), 3 deletions(-)",
-      "firstSeen": "2026-11-10T21:24:00+08:00"
+      "firstSeen": "2026-11-10T21:24:00+08:00",
+      "implementation": {
+        "status": "applied-awaiting-validation",
+        "appliedAt": "2026-11-10T21:52:52+08:00",
+        "note": "已移植输入法方向键、Tab、Esc 修复，保留 fork 观察链与钉住逻辑。",
+        "validation": {
+          "debugBuild": "passed; no new compiler warnings",
+          "lint": "passed",
+          "focusedTextArea": "passed",
+          "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
+          "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
+        }
+      }
     },
     {
       "sha": "cc96c2dccaaaa78aafd642e33c840f1710af0032",
@@ -507,7 +531,19 @@
         "docs/testing.md"
       ],
       "stat": "27 files changed, 591 insertions(+), 115 deletions(-)",
-      "firstSeen": "2026-11-10T21:24:00+08:00"
+      "firstSeen": "2026-11-10T21:24:00+08:00",
+      "implementation": {
+        "status": "applied-awaiting-validation",
+        "appliedAt": "2026-11-10T21:52:52+08:00",
+        "note": "仅移植非 AI 稳定性修复、套件互斥/结果计数和 FileIndexHelper 发布检查。跳过 AI/Codex/Claude/翻译、issue 自动关闭工作流、贡献说明及未使用的窗口布局方法清理。",
+        "validation": {
+          "debugBuild": "passed; no new compiler warnings",
+          "lint": "passed",
+          "focusedTextArea": "passed",
+          "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
+          "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
+        }
+      }
     },
     {
       "sha": "9a097620c384d84e017e6109a3196102cb41e5ce",
@@ -580,7 +616,19 @@
         "docs/features/clipboard.md"
       ],
       "stat": "3 files changed, 49 insertions(+)",
-      "firstSeen": "2026-11-10T21:24:00+08:00"
+      "firstSeen": "2026-11-10T21:24:00+08:00",
+      "implementation": {
+        "status": "applied-awaiting-validation",
+        "appliedAt": "2026-11-10T21:52:52+08:00",
+        "note": "已移植 HTML/RTF-only 采集，pasteboard-test 通过，保留 fork 剪贴板快捷键。",
+        "validation": {
+          "debugBuild": "passed; no new compiler warnings",
+          "lint": "passed",
+          "focusedTextArea": "passed",
+          "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
+          "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
+        }
+      }
     },
     {
       "sha": "7a686bc9b932a0090e7853873a24a14940dd7c9a",
@@ -799,7 +847,19 @@
       ],
       "overlap": [],
       "stat": "1 file changed, 7 insertions(+), 2 deletions(-)",
-      "firstSeen": "2026-11-10T21:24:00+08:00"
+      "firstSeen": "2026-11-10T21:24:00+08:00",
+      "implementation": {
+        "status": "applied-awaiting-validation",
+        "appliedAt": "2026-11-10T21:52:52+08:00",
+        "note": "已移植切换外观后读回实际状态的提示修复。",
+        "validation": {
+          "debugBuild": "passed; no new compiler warnings",
+          "lint": "passed",
+          "focusedTextArea": "passed",
+          "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
+          "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
+        }
+      }
     },
     {
       "sha": "2008ba93c114a594c20b5d72d3ffae8a2a26c0a6",
@@ -845,7 +905,19 @@
       ],
       "overlap": [],
       "stat": "1 file changed, 3 insertions(+)",
-      "firstSeen": "2026-11-10T21:24:00+08:00"
+      "firstSeen": "2026-11-10T21:24:00+08:00",
+      "implementation": {
+        "status": "applied-awaiting-validation",
+        "appliedAt": "2026-11-10T21:52:52+08:00",
+        "note": "已移植无限宽探测修复，增加回归；form-input-test --text-area 通过。",
+        "validation": {
+          "debugBuild": "passed; no new compiler warnings",
+          "lint": "passed",
+          "focusedTextArea": "passed",
+          "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
+          "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
+        }
+      }
     },
     {
       "sha": "42cc467631ea20e263f857bbb3e6219bd7d302ae",
@@ -927,7 +999,19 @@
       ],
       "overlap": [],
       "stat": "2 files changed, 6 insertions(+), 1 deletion(-)",
-      "firstSeen": "2026-11-10T21:24:01+08:00"
+      "firstSeen": "2026-11-10T21:24:01+08:00",
+      "implementation": {
+        "status": "applied-awaiting-validation",
+        "appliedAt": "2026-11-10T21:52:52+08:00",
+        "note": "已移植普通窗口创建前切换激活策略；无 AI 功能更新。",
+        "validation": {
+          "debugBuild": "passed; no new compiler warnings",
+          "lint": "passed",
+          "focusedTextArea": "passed",
+          "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
+          "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
+        }
+      }
     },
     {
       "sha": "3c0073fc62dd67d0048699ea8bc62458976c5a25",
@@ -941,7 +1025,19 @@
       ],
       "overlap": [],
       "stat": "2 files changed, 23 insertions(+), 7 deletions(-)",
-      "firstSeen": "2026-11-10T21:24:01+08:00"
+      "firstSeen": "2026-11-10T21:24:01+08:00",
+      "implementation": {
+        "status": "applied-awaiting-validation",
+        "appliedAt": "2026-11-10T21:52:52+08:00",
+        "note": "已移植 Notes 原生标题栏拖动和双击处理。",
+        "validation": {
+          "debugBuild": "passed; no new compiler warnings",
+          "lint": "passed",
+          "focusedTextArea": "passed",
+          "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
+          "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
+        }
+      }
     },
     {
       "sha": "9df93751eb7fa9b56a1f0f8d0559ad4f063d272b",

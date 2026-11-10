@@ -290,8 +290,9 @@ is what shows; `invalidateShadow()` on every show recuts the shadow to match.
 The title bar is a 44-point band, and both halves of it are deliberate. `titleVisibility` is
 `.hidden` and `NotesView` draws the title itself, centred on the **window**: a titlebar accessory
 drops `NSThemeFrame` off its centred-title layout, so the native title would sit beside the traffic
-lights. The drawn title is not hit-testable, so clicks fall through to the real title bar and drag
-the window. The three actions cannot do that, so they live in an `NSTitlebarAccessoryViewController`
+lights. The drag band is not hit-testable, so presses reach AppKit's title-bar drag. The panel claims
+a double-click there before AppKit's own title-bar action; traffic lights keep their own clicks.
+The three actions live in an `NSTitlebarAccessoryViewController`
 at `.trailing` — `NoteTitlebarActions`, the launcher's footer capsule (`BarButton` in a
 `frosted(in: Capsule())`) with glyphs in place of pills. Its 44-point height is what sizes the band.
 

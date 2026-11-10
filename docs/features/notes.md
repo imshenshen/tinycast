@@ -109,6 +109,10 @@ failed flush retains the draft for retry.
 
 ## Commands, switcher, and window
 
+The title-bar drag band passes presses through to AppKit so the system moves the window, including
+on macOS 27.2. The panel claims a double-click inside that band to move Notes to the top right;
+traffic-light buttons keep their own clicks.
+
 - **Show Notes** toggles the panel: it selects the last active note and shows it, or hides a visible one.
 - **Create Note** creates and selects one unique Untitled note, including from an empty channel.
 - **Search Notes** shows the same panel with the switcher open and its search field focused.

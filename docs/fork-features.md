@@ -9,7 +9,7 @@
 - Fork 仓库：`origin` — <https://github.com/imshenshen/tinycast>（推送目标）
 - 当前分支：`feat/jd-calendar`（已推送到 `origin`）；`main` 保持与上游一致
 - 最后更新：2026-11-10
-- 最近上游检查：2026-11-10T21:24:01+08:00（上游 `58168bf7`，新增 48 个提交，全部待选择；以 state.json 为准）
+- 最近上游检查：2026-11-10T21:24:01+08:00（上游 `58168bf7`，发现 48 个提交；其中 8 个已按选择移植非 AI 部分，全套测试仍有基线失败，暂留 pending 并附 implementation 记录）
 - 上游检查时间与待处理清单：见 `.claude/skills/fork-sync/state.json`
 - 刷新命令：
   - 上游检查：`python3 -I .claude/skills/fork-sync/scripts/fork_sync.py check`
@@ -76,6 +76,18 @@
 - 内容：面板层级从 `.modalPanel + 1` 提升到 `.mainMenu - 1`，避免被其他应用的置顶窗口遮挡；拖拽引导和对话框继续按面板层级派生。
 - 修改文件：`Platform/WindowLevel.swift`、`docs/ui.md`。
 - 与上游的关系：本轮上游未修改 `WindowLevel.swift`；全屏菜单修复 `7655641` 改的是窗口创建前的激活策略，可独立评估。
+- 2026-11-10 运行验证：被 iTerm2 热键窗口遮挡时，进程实际运行 `/Applications/Tinycast Dev.app` 的 10 月 30 日旧程序，窗口层级仍为 9；源码中的层级 23 未回退。正常退出后，用本次签名构建替换并重启该路径，主程序和调试库哈希与构建产物一致；系统窗口列表确认 Tinycast 层级 23，排在 iTerm2 热键窗口层级 22 之前。无需继续提高层级。
+
+### 9. 吸收上游非 AI 稳定性修复
+
+- 日期：2026-11-10
+- 用户选择：首次筛选的 1–4 组，排除 AI 相关改动。
+- 移植：`e22d381` 输入法导航键；`3879ba7` 的非 AI 数据安全、生命周期和测试运行器修复；`c6da716` 文本域无限宽探测；`7655641` 普通窗口全屏菜单；`3c0073f` Notes 标题栏拖动；`4cd6ef9` 搜索范围文件夹；`18c0f16` 外观提示；`7588828` HTML/RTF 剪贴板采集。
+- `3879ba7` 保留：剪贴板图片采集代次、Quicklink 导入事务、备份逐行惰性读取、相机异步结果身份检查、扩展安装输出排空、文件预览取消检查、设置符号链接重试、更新替换前取消检查、测试套件互斥和结果计数、FileIndexHelper 发布检查。
+- `3879ba7` 未取：AI/Codex/Claude/翻译代码及相应测试文档、上游自动关闭未关联 issue 的 PR 工作流与贡献说明、未使用的窗口布局方法清理。没有修改 `Features/AI`、`Features/MCP`、`Features/QuickActions`。
+- 保留 fork 的 JoyDay 日历/会议、钉住、观察链拆分、剪贴板快捷键、倒计时色值与面板层级。
+- 维护：拉取稳定版标签后，lint 要求删除已发布的 `CompactFavoritesMigration`。按 `docs/migrations.md` 清除其代码、启动调用、专用测试和文档行；由 XcodeGen 重新生成项目，JoyDay 两个文件仍保留。
+- 验证：Debug 构建成功、签名验证通过、lint 通过、Model 无 UI 导入；新增无限宽探测回归，`form-input-test --text-area` 通过。全套 110 个 harness 中 106 通过；`app-installation-test`、`form-input-test`、`callout-test` 保留上次已复现的失败，`onboarding-test` 的焦点失败也由提交前编译的测试程序在当前桌面复现。全套未通过，不调用 `mark-ported`；8 个候选在 pending 内附实施范围与验证记录。
 
 ## 变更文件索引
 
@@ -107,20 +119,37 @@
 | `Tinycast/Features/Backup/Model/SettingsBackupCoverage.swift` | 修改 | 3 |
 | `Tinycast/Palette/MenuPanel.swift` | 修改 | 3 |
 | `Tinycast/Palette/PaletteWindowController.swift` | 修改 | 3 |
-| `Tinycast/Palette/RootPaletteView.swift` | 修改 | 3, 5 |
+| `Tinycast/Palette/RootPaletteView.swift` | 修改 | 3, 5, 9 |
 | `Tinycast/Features/HotKeys/Model/HyperKeyEngine.swift` | 修改 | 5 |
 | `Tinycast/DesignSystem/Scrolling/OverflowFade.swift` | 修改 | 5 |
 | `Tinycast/Resources/Localizable.xcstrings` | 修改 | 1, 2, 3 |
-| `Tinycast.xcodeproj/project.pbxproj` | 修改 | 1 |
+| `Tinycast.xcodeproj/project.pbxproj` | 修改 | 1, 9 |
 | `Tests/calendar-test.swift` | 修改 | 1, 2 |
-| `docs/features/palette.md` | 修改 | 3 |
-| `Tinycast/Features/Clipboard/Model/ClipboardStore.swift` | 修改 | 6 |
+| `docs/features/palette.md` | 修改 | 3, 9 |
+| `Tinycast/Features/Clipboard/Model/ClipboardStore.swift` | 修改 | 6, 9 |
 | `Tinycast/Features/Clipboard/UI/ClipboardScreen.swift` | 修改 | 6 |
 | `Tinycast/Palette/PaletteShortcut.swift` | 修改 | 6 |
-| `Tests/clipboard-test.swift` | 修改 | 6 |
+| `Tests/clipboard-test.swift` | 修改 | 6, 9 |
 | `Tinycast/DesignSystem/Theme.swift` | 修改 | 7 |
 | `Tinycast/Features/Calendar/UI/MeetingRowParts.swift` | 修改 | 7 |
 | `Tinycast/Platform/WindowLevel.swift` | 修改 | 8 |
+| `Tinycast/DesignSystem/FormTextArea.swift` | 修改 | 9 |
+| `Tinycast/Features/Backup/Model/BackupBundle.swift` | 修改 | 9 |
+| `Tinycast/Features/Camera/UI/CameraCoordinator.swift` | 修改 | 9 |
+| `Tinycast/Features/Clipboard/Service/ClipboardManager.swift` | 修改 | 9 |
+| `Tinycast/Features/Extensions/Service/ExtensionInstaller.swift` | 修改 | 9 |
+| `Tinycast/Features/FileSearch/UI/FileSearchPreview.swift` | 修改 | 9 |
+| `Tinycast/Features/Launcher/Settings/SearchScopesSection.swift` | 修改 | 9 |
+| `Tinycast/Features/Notes/UI/NotesPanel.swift`、`NotesView.swift` | 修改 | 9 |
+| `Tinycast/Features/Quicklinks/Model/QuicklinkStore.swift` | 修改 | 9 |
+| `Tinycast/Features/Settings/Service/SettingsFileMonitor.swift` | 修改 | 9 |
+| `Tinycast/Features/SystemActions/Service/SystemActionRunner.swift` | 修改 | 9 |
+| `Tinycast/Features/Updates/Service/UpdateInstaller.swift` | 修改 | 9 |
+| `Tinycast/Platform/ActivationPolicy.swift`、`Tinycast/Windows/AppWindowController.swift` | 修改 | 9 |
+| `Tinycast/App/AppCore.swift` | 修改 | 9 |
+| `Tinycast/Migrations/CompactFavoritesMigration.swift`、`Tests/compact-favorites-migration-test.swift` | 删除 | 9 |
+| `Tests/form-input-test.swift`、`Tests/pasteboard-test.swift`、`Tests/quicklink-test.swift` | 修改 | 9 |
+| `Scripts/run-tests.sh`、`Scripts/verify-signature.sh`、`.github/workflows/release.yml` | 修改 | 9 |
 
 ## 上游同步状态
 
@@ -128,9 +157,9 @@
 - 引用上游改动的默认做法是手工移植；移植后运行构建与相关测试，再用 `fork_sync.py mark-ported <sha>` 记账。
 - 上游自基线以后若改到上表这些文件，`fork_sync.py check` 会在对应提交下标注「⚠ 与本地改动重叠」。
 
-### 2026-11-10 筛选结论（尚未移植）
+### 2026-11-10 首次筛选结论
 
-上游从基线新增 48 个提交，涉及 335 个文件。以下按建议的吸收顺序分组；所有提交仍保留在 `state.json` 的 pending 中，等待选择。
+上游从基线新增 48 个提交，涉及 335 个文件。以下是首次筛选分组；1–4 组后续已按用户选择移植非 AI 部分，进展见功能 9，其他候选未选择。pending 中已移植项附有 implementation 记录。
 
 | 顺序 | 候选 | 收益与适配点 |
 | --- | --- | --- |
@@ -147,4 +176,4 @@
 - 签名/公证/退出时更新及更新提示重构（`dc265b2`、`d129c17`、`57111cf`）涉及发布身份和更新信任。上游 `ReleaseFeed.repository` 仍指向 `abue-ammar/tinycast`；fork 应先确定自己的发布与更新源再吸收。
 - 网站审校和文案提交可后续同步，需保留 JoyDay、钉住、剪贴板快捷键等 fork 差异。
 
-本次提交验证：Debug 构建成功、lint 通过、Model 无 UI 导入。全套 111 个 harness 首跑 106 通过；`ext-test` 和 `icon-cache-test` 单独复跑通过。剩余 `app-installation-test`、`form-input-test`、`callout-test` 的相同失败在提交前基线 `a8cb9ad5` 上均复现，尚未修复；不能视为全套测试通过。
+首次提交验证：Debug 构建成功、lint 通过、Model 无 UI 导入。全套 111 个 harness 首跑 106 通过；`ext-test` 和 `icon-cache-test` 单独复跑通过。剩余 `app-installation-test`、`form-input-test`、`callout-test` 的相同失败在提交前基线 `a8cb9ad5` 上均复现，尚未修复；不能视为全套测试通过。后续移植验证见功能 9。

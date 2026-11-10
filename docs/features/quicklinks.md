@@ -15,6 +15,8 @@ every shortcut without re-registering.
 - **Quicklinks are authored data, and their store never deletes.** A database that will not open is
   **reported, never discarded** — `ClipboardStore`'s delete-and-recreate is only sound because history is
   regenerable, and a link library is not. The database lives in **Application Support**, not Caches.
+- **A bulk import publishes once, after its transaction commits.** A failed append or replace rolls
+  back without changing either the persisted library or the published collection.
 - **`Model/` stays Foundation-only (plus SQLite3) and pure** for `quicklink-test` — the home directory is
   injected, never read. `Service/QuicklinkLauncher` owns every `NSWorkspace` call.
 - **Drawing an argument field reads nothing.** The header's chips come from
