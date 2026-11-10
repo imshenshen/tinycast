@@ -8,8 +8,8 @@
 - 上游：`upstream` / `main` — <https://github.com/abue-ammar/tinycast>（只读）
 - Fork 仓库：`origin` — <https://github.com/imshenshen/tinycast>（推送目标）
 - 当前分支：`feat/jd-calendar`（已推送到 `origin`）；`main` 保持与上游一致
-- 最后更新：2026-10-29
-- 最近上游检查：2026-10-29T18:09:13+08:00（上游仍为基线，无新提交；以 state.json 为准）
+- 最后更新：2026-11-10
+- 最近上游检查：2026-11-10T21:24:01+08:00（上游 `58168bf7`，新增 48 个提交，全部待选择；以 state.json 为准）
 - 上游检查时间与待处理清单：见 `.claude/skills/fork-sync/state.json`
 - 刷新命令：
   - 上游检查：`python3 -I .claude/skills/fork-sync/scripts/fork_sync.py check`
@@ -56,6 +56,27 @@
 - 修改文件：`HyperKeyEngine.swift`、`OverflowFade.swift`、`RootPaletteView.swift`
 - 与上游的关系：纯编译修复，上游跟进后可以直接对齐。
 
+### 6. 剪贴板快捷键调整
+
+- 日期：2026-11-10（提交 `4ac45195`）
+- 内容：默认 ↵ 粘贴、⌘↵ 粘贴为纯文本、⌃⌘↵ 复制；修改默认动作时，粘贴接管该动作原来的快捷键。删除改为 ⌘D，保留 ⌘⌫；菜单、测试和两处快捷键文档同步。
+- 修改文件：`ClipboardStore.swift`、`ClipboardScreen.swift`、`PaletteShortcut.swift`、`Tests/clipboard-test.swift` 及剪贴板文档。
+- 与上游的关系：`3879ba7` 修改同一个 store 的异步图片采集，位置与快捷键映射不同；移植时保留本地映射。上游剪贴板文档仍需按本地快捷键适配。
+
+### 7. 临近会议倒计时强调
+
+- 日期：2026-11-10（提交 `4ac45195`）
+- 内容：临近会议倒计时使用红色粗体，隐藏占位按粗体宽度预留，避免倒计时列变宽。
+- 修改文件：`Theme.swift`、`MeetingRowParts.swift`。
+- 与上游的关系：上游最终状态相对基线没有 Calendar 文件差异，JoyDay 数据源、会议详情与入会流程不受直接影响；玻璃外观更新会修改 `Theme.swift`，需保留 `imminent` 色值。
+
+### 8. 提升启动器窗口层级
+
+- 日期：2026-11-10（提交 `4ac45195`）
+- 内容：面板层级从 `.modalPanel + 1` 提升到 `.mainMenu - 1`，避免被其他应用的置顶窗口遮挡；拖拽引导和对话框继续按面板层级派生。
+- 修改文件：`Platform/WindowLevel.swift`、`docs/ui.md`。
+- 与上游的关系：本轮上游未修改 `WindowLevel.swift`；全屏菜单修复 `7655641` 改的是窗口创建前的激活策略，可独立评估。
+
 ## 变更文件索引
 
 | 文件 | 类型 | 功能 |
@@ -93,9 +114,37 @@
 | `Tinycast.xcodeproj/project.pbxproj` | 修改 | 1 |
 | `Tests/calendar-test.swift` | 修改 | 1, 2 |
 | `docs/features/palette.md` | 修改 | 3 |
+| `Tinycast/Features/Clipboard/Model/ClipboardStore.swift` | 修改 | 6 |
+| `Tinycast/Features/Clipboard/UI/ClipboardScreen.swift` | 修改 | 6 |
+| `Tinycast/Palette/PaletteShortcut.swift` | 修改 | 6 |
+| `Tests/clipboard-test.swift` | 修改 | 6 |
+| `Tinycast/DesignSystem/Theme.swift` | 修改 | 7 |
+| `Tinycast/Features/Calendar/UI/MeetingRowParts.swift` | 修改 | 7 |
+| `Tinycast/Platform/WindowLevel.swift` | 修改 | 8 |
 
 ## 上游同步状态
 
 - 每次检查的时间、检查到的上游 SHA、待处理/已引用的提交，都记录在 `.claude/skills/fork-sync/state.json`。
 - 引用上游改动的默认做法是手工移植；移植后运行构建与相关测试，再用 `fork_sync.py mark-ported <sha>` 记账。
 - 上游自基线以后若改到上表这些文件，`fork_sync.py check` 会在对应提交下标注「⚠ 与本地改动重叠」。
+
+### 2026-11-10 筛选结论（尚未移植）
+
+上游从基线新增 48 个提交，涉及 335 个文件。以下按建议的吸收顺序分组；所有提交仍保留在 `state.json` 的 pending 中，等待选择。
+
+| 顺序 | 候选 | 收益与适配点 |
+| --- | --- | --- |
+| 1 | `e22d381` | 输入法组词期间将方向键、Tab、Esc 留给候选窗。与本地 `RootPaletteView` 重叠，保留观察链拆分和钉住相关逻辑。 |
+| 2 | `3879ba7` | 数据安全与生命周期修复：清空后不再插入迟到的剪贴板图片、Quicklink 批量写事务、Codex 管道离开主线程、扩展安装输出持续排空等。覆盖 27 个文件，按功能核对；保留本地剪贴板快捷键。 |
+| 3 | `c6da716`、`7655641`、`3c0073f`、`4cd6ef9`、`18c0f16` | 独立修复：文本域无限宽探测崩溃、全屏 Space 的普通窗口菜单、Notes 标题栏拖动、搜索范围选择文件夹、切换外观后的提示。当前没有 fork 源文件重叠。 |
+| 4 | `7588828` | 捕获只有 HTML/RTF 的复制内容，转为纯文本；HTML 限制 256 KB。依赖前面的剪贴板采集接口变更，文档需保留本地快捷键。 |
+| 5 | `25d86bf`、`de115d8`、`5fab5cb`、`6ac7216`、`7031f8a`、`42cc467`、`f52b964`、`10421dd` | Raycast 扩展兼容：登录取消完成、uid/gid、SharedArrayBuffer、网卡、AES-GCM、stdio 文件描述符、表单值恢复、缺失配置引导。生成 runtime 必须通过构建脚本更新。 |
+| 6 | `9a09762`、`a9eb610`、`9df9375`、`95ecb01`、`ff4fa05` | AI/MCP：OpenAI Responses 工具调用、OpenCode v2 使用 Tinycast 的 MCP、推理强度、思考展开、聊天预设。按使用需求选择；新文件通过 project.yml/XcodeGen 接入，保留 fork 设置和备份排除项。 |
+| 7 | `2008ba9`、`6bf543f`、`16e64fb`、`1b238e1`、`c538633`、`3be769d`、`bd0cbf9`、`788237c` | 功能扩展：自然语言计算、货币对查询与汇率源、双语词典排版、窗口贴边/跨屏、内置命令 deeplink。词典更新碰到 `RootPaletteView`；deeplink 涉及较多设置、入口和权限边界。 |
+
+- 玻璃外观链 `e3f813c` → `14f3ceb` → `da105e4` → `c1a838a` 应按最终状态整体审查；`7f3e5b4` 已被 `58168bf` 完整回滚，不单独吸收。外观改动与 `Theme`、`RootPaletteView`、`PaletteWindowController`、`MenuPanel` 重叠，保留钉住和本地窗口层级。
+- `1a2c80a` 的 AppSSO 修复使用私有 `_preventsAppSSO` 属性；仅在确实遇到企业 SSO 请求失败时再评估。
+- 签名/公证/退出时更新及更新提示重构（`dc265b2`、`d129c17`、`57111cf`）涉及发布身份和更新信任。上游 `ReleaseFeed.repository` 仍指向 `abue-ammar/tinycast`；fork 应先确定自己的发布与更新源再吸收。
+- 网站审校和文案提交可后续同步，需保留 JoyDay、钉住、剪贴板快捷键等 fork 差异。
+
+本次提交验证：Debug 构建成功、lint 通过、Model 无 UI 导入。全套 111 个 harness 首跑 106 通过；`ext-test` 和 `icon-cache-test` 单独复跑通过。剩余 `app-installation-test`、`form-input-test`、`callout-test` 的相同失败在提交前基线 `a8cb9ad5` 上均复现，尚未修复；不能视为全套测试通过。
