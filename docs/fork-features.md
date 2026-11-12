@@ -7,7 +7,7 @@
 - Fork 基线：`37e6043`（上游 `v0.12.3-beta.127`，2026-10-27）
 - 上游：`upstream` / `main` — <https://github.com/abue-ammar/tinycast>（只读）
 - Fork 仓库：`origin` — <https://github.com/imshenshen/tinycast>（推送目标）
-- 当前分支：`feat/jd-calendar`（已推送到 `origin`）；`main` 保持与上游一致
+- Fork 主分支：`main`（推送到 `origin/main`），已包含 `feat/jd-calendar` 的功能和同步记录；`upstream/main` 仅作为上游比较引用
 - 最后更新：2026-11-12
 - 最近上游检查：2026-11-10T21:24:01+08:00（上游 `58168bf7`，发现 48 个提交；其中 8 个已按选择移植非 AI 部分，全套测试仍有基线失败，暂留 pending 并附 implementation 记录）
 - 上游检查时间与待处理清单：见 `.claude/skills/fork-sync/state.json`
