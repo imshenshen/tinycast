@@ -8,12 +8,33 @@
 - 上游：`upstream` / `main` — <https://github.com/abue-ammar/tinycast>（只读）
 - Fork 仓库：`origin` — <https://github.com/imshenshen/tinycast>（推送目标）
 - 当前分支：`feat/jd-calendar`（已推送到 `origin`）；`main` 保持与上游一致
-- 最后更新：2026-11-10
+- 最后更新：2026-11-12
 - 最近上游检查：2026-11-10T21:24:01+08:00（上游 `58168bf7`，发现 48 个提交；其中 8 个已按选择移植非 AI 部分，全套测试仍有基线失败，暂留 pending 并附 implementation 记录）
 - 上游检查时间与待处理清单：见 `.claude/skills/fork-sync/state.json`
 - 刷新命令：
   - 上游检查：`python3 -I .claude/skills/fork-sync/scripts/fork_sync.py check`
   - 本地盘点：`python3 -I .claude/skills/fork-sync/scripts/fork_sync.py diff`
+
+## 下次同步从哪里继续
+
+入口在根目录 `AGENTS.md` 的 Fork and upstream sync 节，完整流程见
+[fork-sync](../.claude/skills/fork-sync/SKILL.md)。先运行 `status` 读取交接，不必先联网：
+
+```bash
+python3 -I .claude/skills/fork-sync/scripts/fork_sync.py status
+```
+
+当前下次增量起点为 `58168bf7e0b721f7c5fbfc7f4e8a068a48cff446`，由
+`state.json.lastCheckedUpstream` 记录；`check` 获取上游后只扫描该点之后的新增提交。
+`baseCommit` 仍为 fork 原始基线 `37e6043`，用于盘点本地差异，不表示要重新选择或移植所有历史。
+
+当前分为待选择 40 项、已实施待验证 8 项、已验证引用 0 项。8 个已实施项仍在 pending，各项的
+`implementation` 保存了实施范围、验证结果和本地提交 `7af66734`；请继续验证，不要重复移植，
+也不要扩大此前选定的非 AI 范围。`status` 和 `check` 都会单独显示这些项。
+
+通过 `mark-applied` 记录已实施待验证的工作，通过 `mark-ported` 记录验证通过的引用。
+下次检查会保留现有待办；检查点失效而回到基线重扫时，也会保留实施记录和首次发现时间。
+2026-11-12 只完善了交接工具，没有重新获取上游，检查时间和增量检查点保持 2026-11-10 的记录。
 
 ## 功能记录
 

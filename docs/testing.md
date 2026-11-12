@@ -51,6 +51,17 @@ through a stand-in for the hosted redirect page and confirms that a callback who
 repeated, stale or wrong is refused, for each redirect method and for custom `{ url }` requests. The
 runtime fixture suite runs both as well.
 
+Fork-sync tooling has its own offline integration checks:
+
+```sh
+python3 -I Scripts/test-fork-sync.py
+```
+
+Run them after changing `.claude/skills/fork-sync/scripts/fork_sync.py`. They create temporary Git
+repositories and a local remote to check incremental scans, implementation records, checkpoint
+fallback and read-only status reporting. They never fetch the real upstream or advance its saved
+checkpoint.
+
 The suite runs four harnesses at a time by default to reduce CPU usage. `TINYCAST_TEST_JOBS` overrides
 that limit; `TINYCAST_TEST_JOBS=1` runs one at a time. Each result is numbered
 against the total and shows its run and compile time, a quiet stretch names the harnesses still running, and a harness that runs longer

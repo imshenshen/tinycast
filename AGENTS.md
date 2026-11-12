@@ -6,6 +6,22 @@ and an emoji picker. It also **runs Raycast extensions** natively, in JavaScript
 SwiftUI + AppKit, running as an accessory with no Dock icon (`LSUIElement`). Zero third-party
 dependencies.
 
+## Fork and upstream sync
+
+This is the `imshenshen/tinycast` fork. Before checking or absorbing upstream updates, read
+[fork-sync](.claude/skills/fork-sync/SKILL.md) and [the fork record](docs/fork-features.md), then run:
+
+```sh
+python3 -I .claude/skills/fork-sync/scripts/fork_sync.py status
+```
+
+The committed [state.json](.claude/skills/fork-sync/state.json) is the handoff between agents.
+`lastCheckedUpstream` is the next incremental scan's starting point; `baseCommit` is the original
+fork baseline for overlap analysis. Neither says every earlier commit was absorbed. Pending entries
+with `implementation` have already been applied: inspect their scope, local commit and validation
+notes, and continue validation instead of applying them again. Preserve recorded exclusions,
+including the user's non-AI selection. `upstream` is read-only; `origin` is the fork's push target.
+
 ## Posture: modern-first, always
 
 **Tinycast supports macOS 26 and later, with macOS 27 strongly preferred.** Swift 6+ with complete

@@ -175,7 +175,8 @@
           "focusedTextArea": "passed",
           "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
           "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
-        }
+        },
+        "localCommit": "7af66734adc854292314f1b1c4035a3c66880261"
       }
     },
     {
@@ -220,7 +221,8 @@
           "focusedTextArea": "passed",
           "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
           "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
-        }
+        },
+        "localCommit": "7af66734adc854292314f1b1c4035a3c66880261"
       }
     },
     {
@@ -542,7 +544,8 @@
           "focusedTextArea": "passed",
           "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
           "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
-        }
+        },
+        "localCommit": "7af66734adc854292314f1b1c4035a3c66880261"
       }
     },
     {
@@ -627,7 +630,8 @@
           "focusedTextArea": "passed",
           "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
           "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
-        }
+        },
+        "localCommit": "7af66734adc854292314f1b1c4035a3c66880261"
       }
     },
     {
@@ -858,7 +862,8 @@
           "focusedTextArea": "passed",
           "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
           "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
-        }
+        },
+        "localCommit": "7af66734adc854292314f1b1c4035a3c66880261"
       }
     },
     {
@@ -916,7 +921,8 @@
           "focusedTextArea": "passed",
           "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
           "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
-        }
+        },
+        "localCommit": "7af66734adc854292314f1b1c4035a3c66880261"
       }
     },
     {
@@ -1010,7 +1016,8 @@
           "focusedTextArea": "passed",
           "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
           "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
-        }
+        },
+        "localCommit": "7af66734adc854292314f1b1c4035a3c66880261"
       }
     },
     {
@@ -1036,7 +1043,8 @@
           "focusedTextArea": "passed",
           "fullSuite": "106/110 passed; baseline failures: app-installation-test, form-input-test, callout-test, onboarding-test",
           "baselineEvidence": "First three reproduced at a8cb9ad5; pre-port onboarding binary also fails to become key on the current desktop."
-        }
+        },
+        "localCommit": "7af66734adc854292314f1b1c4035a3c66880261"
       }
     },
     {

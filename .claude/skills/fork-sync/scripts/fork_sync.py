@@ -5,6 +5,7 @@ Subcommands:
   check         fetch upstream, list commits since the last check, update state
   diff          list local fork changes against the fork base (with upstream overlap)
   status        print the recorded state, no network
+  mark-applied  record an implementation that still needs validation
   mark-ported   mark a pending upstream commit as ported
   drop          stop tracking a pending upstream commit
 
@@ -202,6 +203,42 @@ def print_commit_entry(index: int, entry: dict, marker: str) -> None:
     first_seen = entry.get("firstSeen")
     if first_seen:
         print(f"     首次发现: {first_seen}")
+    implementation = entry.get("implementation") or {}
+    if implementation:
+        print("     状态: 已实施、待验证；继续验证，不要重复移植")
+        if implementation.get("note"):
+            print(f"     实施范围: {implementation['note']}")
+        if implementation.get("localCommit"):
+            print(f"     本地提交: {implementation['localCommit']}")
+        for key, value in implementation.get("validation", {}).items():
+            print(f"     验证 {key}: {value}")
+
+
+def pending_groups(state: dict) -> tuple[list[dict], list[dict]]:
+    candidates = []
+    applied = []
+    for entry in state["pending"]:
+        (applied if entry.get("implementation") else candidates).append(entry)
+    return candidates, applied
+
+
+def print_pending(state: dict) -> None:
+    candidates, applied = pending_groups(state)
+    print(f"待选择      : {len(candidates)}")
+    print(f"已实施待验证: {len(applied)}")
+    print(f"已验证引用  : {len(state['ported'])}")
+    print(f"已放弃      : {len(state['dropped'])}")
+    if candidates:
+        print()
+        print("--- 待选择（按此编号选择要移植的提交）---")
+        for index, entry in enumerate(candidates, 1):
+            warn = "  ⚠ 与本地改动重叠" if entry.get("overlap") else ""
+            print(f"  {index}) {entry['sha'][:7]}  {entry['subject']}{warn}")
+    if applied:
+        print()
+        print("--- 已实施、待验证（不要重复移植）---")
+        for index, entry in enumerate(applied, 1):
+            print_commit_entry(index, entry, "[待验证]")
 
 
 def cmd_check(_args: argparse.Namespace) -> None:
@@ -233,34 +270,30 @@ def cmd_check(_args: argparse.Namespace) -> None:
     known = {e["sha"] for e in state["ported"]} | {
         e["sha"] for e in state["dropped"]
     }
-    new_shas = {c["sha"] for c in commits}
-    kept = [e for e in state["pending"] if e["sha"] not in new_shas]
+    pending = {entry["sha"]: entry for entry in state["pending"] if entry["sha"] not in known}
+    for entry in pending.values():
+        entry["overlap"] = sorted(set(entry.get("files", [])) & local)
     appended = []
-    seen = {e["sha"] for e in kept}
     for commit in commits:
         sha = commit["sha"]
-        if sha in known or sha in seen:
+        if sha in known or sha in pending:
             continue
         files = commit_files(sha)
-        appended.append(
-            {
-                "sha": sha,
-                "short": sha[:7],
-                "date": commit["date"],
-                "subject": commit["subject"],
-                "body": commit["body"],
-                "files": files,
-                "overlap": sorted(set(files) & local),
-                "stat": commit_stat(sha),
-                "firstSeen": now(),
-            }
-        )
-        seen.add(sha)
+        entry = {
+            **commit,
+            "short": sha[:7],
+            "files": files,
+            "overlap": sorted(set(files) & local),
+            "stat": commit_stat(sha),
+            "firstSeen": now(),
+        }
+        pending[sha] = entry
+        appended.append(entry)
 
     checked_at = now()
     state["lastCheck"] = checked_at
     state["lastCheckedUpstream"] = head
-    state["pending"] = kept + appended
+    state["pending"] = list(pending.values())
     save_state(state)
 
     print()
@@ -268,10 +301,11 @@ def cmd_check(_args: argparse.Namespace) -> None:
     tag = f" ({state['baseTag']})" if state.get("baseTag") else ""
     print(f"fork 基线 : {base[:7]}{tag}")
     print(f"上游      : {ref} @ {head[:7]}")
+    print(f"扫描起点  : {start}")
+    print(f"下次增量  : {head}")
     print(f"上次检查  : {previous_check or '从未'}")
     print(f"本次检查  : {checked_at}")
     print(f"新增提交  : {len(appended)}")
-    print(f"待处理    : {len(state['pending'])}")
 
     if appended:
         print()
@@ -279,21 +313,8 @@ def cmd_check(_args: argparse.Namespace) -> None:
         for i, entry in enumerate(appended, 1):
             print_commit_entry(i, entry, "[新]")
 
-    if kept:
-        print()
-        print("--- 以前发现、仍未处理 ---")
-        for i, entry in enumerate(kept, 1):
-            print_commit_entry(i, entry, "[待]")
-
-    if state["pending"]:
-        print()
-        print("待处理清单（按此编号让用户选择）:")
-        for i, entry in enumerate(state["pending"], 1):
-            warn = "  ⚠ 与本地改动重叠" if entry.get("overlap") else ""
-            print(f"  {i}) {entry['sha'][:7]}  {entry['subject']}{warn}")
-    else:
-        print()
-        print("没有待处理的上游提交。")
+    print()
+    print_pending(state)
 
 
 def cmd_diff(args: argparse.Namespace) -> None:
@@ -370,15 +391,12 @@ def cmd_status(_args: argparse.Namespace) -> None:
     print(f"上游        : {ref}" + (f" @ {head[:7]}" if head else "（未获取）"))
     print(f"上次检查    : {state.get('lastCheck') or '从未'}")
     print(f"上次检查到  : {state.get('lastCheckedUpstream') or '—'}")
-    print(f"待处理      : {len(state['pending'])}")
-    for i, entry in enumerate(state["pending"], 1):
-        print(f"  {i}) {entry['sha'][:7]}  {entry['subject']}")
-    print(f"已引用      : {len(state['ported'])}")
+    print(f"下次增量起点: {state.get('lastCheckedUpstream') or state.get('baseCommit') or '未设置'}")
+    print_pending(state)
     for entry in state["ported"]:
-        print(f"  {entry['sha'][:7]}  {entry['subject']}  ({entry.get('portedAt', '')})")
-    print(f"已放弃      : {len(state['dropped'])}")
+        print(f"[已验证] {entry['sha'][:7]}  {entry['subject']}  ({entry.get('portedAt', '')})")
     for entry in state["dropped"]:
-        print(f"  {entry['sha'][:7]}  {entry['subject']}  ({entry.get('droppedAt', '')})")
+        print(f"[已放弃] {entry['sha'][:7]}  {entry['subject']}  ({entry.get('droppedAt', '')})")
 
 
 def find_pending(state: dict, prefix: str) -> dict:
@@ -390,11 +408,31 @@ def find_pending(state: dict, prefix: str) -> dict:
     return matches[0]
 
 
+def cmd_mark_applied(args: argparse.Namespace) -> None:
+    state = load_state()
+    entry = find_pending(state, args.sha)
+    implementation = entry.setdefault("implementation", {})
+    if args.commit:
+        implementation["localCommit"] = git("rev-parse", "--verify", f"{args.commit}^{{commit}}").strip()
+    implementation.update({
+        "status": "applied-awaiting-validation",
+        "appliedAt": implementation.get("appliedAt") or now(),
+        "note": args.note,
+    })
+    implementation.setdefault("validation", {})["summary"] = args.validation
+    save_state(state)
+    print(f"已记录实施、待验证: {entry['sha'][:7]}  {entry['subject']}")
+    print(f"实施范围: {args.note}")
+    print(f"验证: {args.validation}")
+
+
 def cmd_mark_ported(args: argparse.Namespace) -> None:
     state = load_state()
     entry = find_pending(state, args.sha)
     state["pending"] = [e for e in state["pending"] if e["sha"] != entry["sha"]]
     entry["portedAt"] = now()
+    if entry.get("implementation"):
+        entry["implementation"]["status"] = "validated"
     entry["note"] = args.note
     state["ported"].append(entry)
     save_state(state)
@@ -430,6 +468,12 @@ def main() -> None:
     )
     sub.add_parser("status", help="打印状态，不联网")
 
+    p_applied = sub.add_parser("mark-applied", help="记录已实施但尚待验证的提交")
+    p_applied.add_argument("sha", help="提交 SHA 或其唯一前缀")
+    p_applied.add_argument("note", help="实际移植范围，含排除的部分")
+    p_applied.add_argument("--commit", help="对应的本地提交（尚未提交时可省略）")
+    p_applied.add_argument("--validation", required=True, help="已完成的验证和剩余问题")
+
     p_port = sub.add_parser("mark-ported", help="标记某个上游提交已引用")
     p_port.add_argument("sha", help="提交 SHA 或其唯一前缀")
     p_port.add_argument("note", nargs="?", default="", help="备注")
@@ -443,6 +487,7 @@ def main() -> None:
         "check": cmd_check,
         "diff": cmd_diff,
         "status": cmd_status,
+        "mark-applied": cmd_mark_applied,
         "mark-ported": cmd_mark_ported,
         "drop": cmd_drop,
     }
